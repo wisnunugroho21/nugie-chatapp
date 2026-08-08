@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Chatbot Coba</title>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"/>
+        <link rel="stylesheet" href="main.css">
+    </head>
+    <body>
+        <div id="app" class="app">
+
+            <!-- LEFT SECTION -->
+
+            <section id="main-left" class="main-left">
+                <!-- header -->
+                <div id="header-left" class="header-left">
+                    <div class="header-left-title">TMS</div>
+
+                </div>
+
+                <!-- chat list -->
+                <div id="chat-list" class="chat-list">
+                    <div class="search-area">
+                        <!-- attachment btn -->
+                        <div class="search-btn">
+                            <span class="material-symbols-outlined">search</span>
+                        </div>
+
+                        <!-- input form -->
+                        <input id="type-search-area" class="type-search-area" placeholder="Type something...">
+                    </div>
+
+                    <!-- user lists -->
+                    <div id="friends" class="friends">
+                        <!-- photo -->
+                        <div class="profile friends-photo">
+                            <img src="images/ava2.jpg" alt="">
+                        </div>
+
+                        <div class="friends-credent">
+                            <!-- name -->
+                            <span class="friends-name">Mario Gomez</span>
+                            <!-- last message -->
+                            <span class="friends-message">Crap! I forgot my shoes. Can you bring extra pair for me? Crap! I forgot my shoes. Can you bring extra pair for me?</span>
+                        </div>
+                        <!-- notification badge -->
+                        <span class="badge notif-badge">7</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- RIGHT SECTION -->
+
+            <section id="main-right" class="main-right">
+                <!-- header -->
+                <div id="header-right" class="header-right">
+                    <!-- profile pict -->
+                    <div id="header-img" class="profile header-img">
+                        <img src="images/ava2.jpg" alt="">
+                    </div>
+
+                    <!-- name -->
+                    <div class="friend-desc">
+                        <h4 class="name friend-name">Mario Gomez</h4>
+                        <p class="friend-status">Yo Dybala!</p>
+                    </div>
+
+                    <!-- some btn -->
+                    <div class="some-btn">
+                        <span class="material-symbols-outlined">headphones</span>
+                    </div>
+                </div>
+
+                <!-- chat area -->
+                <div id="chat-area" class="chat-area">
+                    <!-- chat content -->
+
+                    <!-- FRIENDS CHAT TEMPLATE -->
+                    <div id="friends-chat" class="friends-chat">
+                        <div class="profile friends-chat-photo">
+                            <img src="images/ava2.jpg" alt="">
+                        </div>
+                        <div class="friends-chat-content">
+                            <p class="friends-chat-name">Mario Gomez</p>
+                            <p class="friends-chat-balloon">Yo Dybala!</p>
+                            <h5 class="chat-datetime">Sun, Aug 30 | 15:41</h5>
+                        </div>
+                    </div>
+
+                    <!-- YOUR CHAT TEMPLATE -->
+                    <div id="your-chat" class="your-chat">
+                        <p class="your-chat-balloon">'sup</p>
+                        <p class="chat-datetime"><span class="glyphicon glyphicon-ok"></span> Sun, Aug 30 | 15:45</p>
+                    </div>
+                </div>
+
+                <!-- typing area -->
+                <div id="typing-area" class="typing-area">
+                    <div class="input-area">
+                        <!-- input form -->
+                        <input id="type-area" class="type-area" placeholder="Type something...">
+                        <!-- attachment btn -->
+                        <div class="attach-btn">
+                            <span class="material-symbols-outlined btn">attach_file</span>
+                        </div>
+                    </div>
+                    <!-- send btn -->
+                    <div class="send-area">
+                        <span class="material-symbols-outlined send-btn btn">send</span>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </body>
+</html>

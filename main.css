@@ -1,0 +1,456 @@
+@import url('https://googleapis.com');
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Roboto', 'Roboto Flex', sans-serif;
+}
+
+input {
+    font-family: 'Roboto', 'Roboto Flex', sans-serif;
+}
+
+.material-symbols-outlined.light {
+    /* color: white; */
+}
+
+.app {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+}
+
+.profile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* display: flex;
+    align-items: center;
+    justify-content: center; */
+    /* border: 5px solid lime; */
+    height: 40px;
+    width: 40px;
+    overflow: hidden;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.profile img {
+    width: inherit;
+}
+
+.main-left {
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+}
+
+.header-left {
+    /* border: 5px solid salmon; */
+    display: flex;
+    flex-direction: row;
+    place-items: center start;
+    padding: 5px;
+    height: 50px;
+}
+
+.header-left-title {
+    /* color: white; */
+    font-size: 1.25em;
+}
+
+.hamburger-btn, .search-btn {
+    place-self: center start;
+}
+
+.option-btn {
+    place-self: center end;
+}
+
+.chat-list {
+    /* border: 5px solid cyan; */
+    flex: 1;
+    overflow-y: auto;
+}
+
+.chat-list::-webkit-scrollbar {
+    width: 0px;
+}
+
+.friends {
+    /* border: 5px solid yellow; */
+    padding: 5px;
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-columns: 1fr 4fr 1fr;
+    cursor: pointer;
+    transition: 0.2s linear;
+}
+
+.friends:hover {
+    background: #041a31;
+}
+
+.friends-photo {
+    place-self: center;
+}
+
+.friends-credent {
+    /* border: 5px solid magenta; */
+    padding: 5px;
+    display: grid;
+    grid-auto-flow: row;
+    grid-template-rows: 1fr 1fr;
+    place-items: center start;
+    overflow: hidden;
+}
+
+.friends-name, .friends-message {
+    font-weight: 600;
+    /* padding: 1px; */
+}
+
+.friends-name {
+    /* color: white; */
+    place-self: end start;
+    font-size: 1.25em;
+    /* border: 5px solid magenta; */
+}
+
+.friends-message {
+    /* border: 5px solid blanchedalmond; */
+    color: #777;
+    font-size: 0.85em;
+    place-self: start;
+
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2; /* Change this number to your desired max lines */
+    line-clamp: 2;        /* Standardized property */
+    overflow: hidden;
+}
+
+.badge {
+    display: inline-block;
+    padding: 0.35em 0.65em;
+    font-size: 0.75em;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.375rem;
+}
+
+.notif-badge {
+    place-self: center;
+    background: black;
+    padding: 7px;
+    /* background: white; */
+    /* color: #555; */
+}
+
+.self-info {
+    /* border: 5px solid magenta; */
+    padding: 5px;
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-columns: 1fr 4fr 1fr;
+    place-items: center;
+    background: #041b33;
+    box-shadow: 0px -3px 5px rgba(0, 0, 0, 0.4);
+}
+
+.your-photo {
+    /* border: 5px solid lime; */
+    height: 50px;
+    width: 50px;
+    place-content: center start;
+    place-self: center end;
+}
+
+.your-name {
+    /* border: 5px solid bisque; */
+    /* color: white; */
+    margin-left: 20px;
+    place-self: center start;
+}
+
+/* END OF LEFT SECTION */
+/* ################################################## */
+/* START OF RIGHT SECTION */
+
+.main-right {
+    background: #dedede;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.header-right {
+    /* border: 5px solid greenyellow; */
+    padding: 5px;
+    height: 50px;
+    background: white;
+    display: flex;
+    flex-direction: row;
+    place-items: center;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.4);
+}
+
+.header-img {
+    place-content: center start;
+    place-self: center end;
+}
+
+.name {
+    margin: 0;
+    font-size: 1em;
+}
+
+.friend-name {
+    /* border: 5px solid violet; */
+    place-self: center start;
+    color: #485373;
+}
+
+.friend-status {
+    margin: 0;
+    min-width: min-content;
+    color: #485373;
+    background: white;
+    font-size: 0.85em;
+}
+
+.friend-desc {
+    display: flex;
+    flex-direction: column;
+    margin-left: 10px;
+}
+
+.some-btn {
+    /* border: 5px solid maroon; */
+    font-size: 1.5em;
+    place-items: center end;
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+    flex: 1;
+}
+
+.some-btn .glyphicon {
+    margin: 0px 10px;
+    cursor: pointer;
+}
+
+.chat-area {
+    /* border: 5px solid lightseagreen; */
+    flex: 1;
+    overflow-y: auto;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.chat-area::-webkit-scrollbar {
+    width: 0;
+}
+
+.friends-chat {
+    /* border: 3px solid beige; */
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 10px;
+    display: flex;
+    flex-direction: row;
+}
+
+.friends-chat-photo {
+    /* border: 3px solid orchid; */
+    place-self: start end;
+    margin: 0px 5px;
+}
+
+.friends-chat-content {
+    /* border: 3px solid red; */
+    flex: 1;
+    display: grid;
+    grid-auto-flow: row;
+    grid-template-rows: 1fr min-content min-content;
+    place-items: start;
+}
+
+.friends-chat-name {
+    color: #485373;
+    font-size: 1em;
+    margin: 0px 0px 3px 0px;
+    font-weight: bold;
+}
+
+
+.friends-chat-balloon{
+    /* border: 3px solid navy; */
+    max-width: 90%;
+    padding: 10px 20px;
+    margin: 0;
+    min-width: min-content;
+    border-radius: 0px 20px 20px 20px; /* TL-TR-BR-BL*/
+    color: #485373;
+    background: white;
+    font-size: 0.85em;
+}
+
+.chat-datetime {
+    /* border: 3px solid yellow; */
+    margin: 3px 10px;
+    font-size: 0.75em;
+    color: #aaa;
+}
+
+.your-chat {
+    /* border: 3px solid chocolate; */
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-right: 10px;
+    place-items: start end;
+}
+
+.your-chat-balloon {
+    /* border: 3px solid blueviolet; */
+    max-width: 80%;
+    padding: 10px 20px;
+    margin: 0;
+    min-width: min-content;
+    border-radius: 20px 20px 0px 20px; /* TL-TR-BR-BL*/
+    /* color: white; */
+    background: darkslateblue;
+    font-size: 0.85em;
+}
+
+.your-chat-datetime .glyphicon {
+    margin-right: 5px;
+    color: green;
+}
+
+.typing-area {
+    /* border: 5px solid goldenrod; */
+    padding: 5px;
+    gap: 10px;
+    display: flex;
+    flex-direction: row;
+}
+
+.type-area {
+    /* border: 5px solid blueviolet; */
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 5px 20px;
+    color: #333;
+    font-size: 0.85em;
+}
+
+input::placeholder {
+    color: #777;
+}
+
+.typing-area .glyphicon, .attach-btn {
+    color: #555;
+    cursor: pointer;
+    place-self: center;
+    transition: .2s linear;
+}
+
+.typing-area .glyphicon:hover, .attach-btn span:hover {
+    color: darkslateblue;
+}
+
+.attach-btn {
+    /* border: 5px solid coral; */
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    font-size: 1em;
+}
+
+.attach-btn span {
+    margin: 0px 10px;
+}
+
+.send-btn {
+    /* border: 5px solid darkcyan; */
+    /* font-size: 1em; */
+}
+
+.material-symbols-outlined {
+    font-size: 1em;
+}
+
+.input-area {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border: solid 1px gray;
+    border-radius: 100px;
+    background: white;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.send-area {
+    padding: 15px;
+    display: flex;
+    place-items: center;
+    border: solid 1px gray;
+    border-radius: 100px;
+    background: green;
+    /* color: white; */
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.search-area {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border: solid 1px gray;
+    border-radius: 100px;
+    background: white;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+    margin: auto 5px;
+}
+
+.type-search-area {
+    /* border: 5px solid blueviolet; */
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 10px 20px 10px 0px;
+    color: #333;
+    font-size: 0.85em;
+}
+
+.search-area .glyphicon, .search-btn {
+    color: #555;
+    cursor: pointer;
+    place-self: center;
+    transition: .2s linear;
+}
+
+.search-area .glyphicon:hover, .search-btn span:hover {
+    color: darkslateblue;
+}
+
+.search-btn {
+    /* border: 5px solid coral; */
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    font-size: 1.25em;
+}
+
+.search-btn span {
+    margin: 0px 10px;
+}
