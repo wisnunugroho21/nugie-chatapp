@@ -236,6 +236,7 @@ SIDEBAR
     padding: 10px 14px 10px 16px;
     cursor: pointer;
     transition: background 0.12s ease;
+    border-top: 1px solid var(--border);
 }
 .chat-item:hover {
     background: var(--panel-2);
@@ -244,11 +245,11 @@ SIDEBAR
     background: var(--panel-3);
 }
 .chat-item + .chat-item .ci-body {
-    border-top: 1px solid var(--border);
+    /* border-top: 1px solid var(--border); */
 }
 .chat-item:hover + .chat-item .ci-body,
 .chat-item.is-active + .chat-item .ci-body {
-    border-top-color: transparent;
+    /* border-top-color: transparent; */
 }
 
 .avatar {
@@ -286,12 +287,10 @@ SIDEBAR
 .ci-body {
     flex: 1;
     min-width: 0;
-    padding-bottom: 10px;
-    margin-top: -10px;
-    padding-top: 10px;
     display: grid;
     grid-template-columns: 1fr auto;
     gap: 2px 8px;
+    padding: 5px 0px;
 }
 .ci-name {
     grid-column: 1;
@@ -316,6 +315,9 @@ SIDEBAR
     color: var(--muted);
     white-space: nowrap;
     overflow: hidden;
+}
+.ci-msg .material-symbols-outlined {
+    font-size: 16px;
 }
 .ci-msg span {
     overflow: hidden;
@@ -416,15 +418,15 @@ CHAT PANEL
 
 /* --- Messages --- */
 .thread {
-    position: relative;
     z-index: 1;
-    flex: 1;
+    flex: 1 1 0;
+    min-height: 0;
     overflow-y: auto;
     overscroll-behavior: contain;
     padding: 14px 6%;
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    gap: 12px;
 }
 .thread::-webkit-scrollbar {
     width: 6px;
@@ -470,7 +472,7 @@ CHAT PANEL
     justify-content: flex-end;
 }
 .row.first {
-    margin-top: 12px;
+    /* margin-top: 12px; */
 }
 
 .bubble {
@@ -494,6 +496,9 @@ CHAT PANEL
 }
 .first.out .bubble {
     border-top-right-radius: 0;
+}
+.bubble .text .material-symbols-outlined {
+    font-size: 16px;
 }
 
 /* Bubble tails */
@@ -540,6 +545,7 @@ CHAT PANEL
     font-size: 11px;
     color: #ffffff8a;
     white-space: nowrap;
+    margin-top: 4px;
 }
 .out .meta {
     color: #ffffff99;
@@ -548,6 +554,7 @@ CHAT PANEL
 /* Quoted reply */
 .quote {
     display: block;
+    margin-top: 4px;
     margin-bottom: 4px;
     padding: 5px 8px;
     border-left: 4px solid #53bdeb;
@@ -705,7 +712,7 @@ CHAT PANEL
 .btn-send {
     display: none;
 }
-.msg-input:not(:placeholder-shown) ~ .btn-send {
+.composer:has(.msg-input:not(:placeholder-shown)) .btn-send {
     display: grid;
     color: var(--accent);
 }
@@ -720,10 +727,11 @@ RESPONSIVE — one pane at a time below 900px
 @media (max-width: 900px) {
     .app {
         grid-template-columns: 1fr;
-        grid-template-rows: 1fr;
+        grid-template-rows: minmax(0, 1fr);
     }
     .sidebar,
     .chat {
+        min-height: 0;
         grid-area: 1/1;
     }
     .sidebar {
