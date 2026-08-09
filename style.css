@@ -65,9 +65,9 @@ input {
 }
 
 :focus-visible {
-    outline: 2px solid var(--accent);
+    /* outline: 2px solid var(--accent);
     outline-offset: 2px;
-    border-radius: 4px;
+    border-radius: 4px; */
 }
 
 /* Icon defaults: every icon is a stroked SVG, sized from font-size */
@@ -171,7 +171,7 @@ SIDEBAR
     color: var(--muted);
 }
 .search:focus-within {
-    box-shadow: inset 0 0 0 1.5px var(--accent);
+    /*box-shadow: inset 0 0 0 1.5px var(--accent);*/
 }
 .search input {
     flex: 1;
@@ -531,12 +531,10 @@ CHAT PANEL
 
 .text {
     font-size: 14.5px;
-    padding-right: 58px;
 }
 .meta {
-    float: right;
-    margin: -14px -2px -4px 0;
     display: flex;
+    justify-content: end;
     align-items: center;
     gap: 3px;
     font-size: 11px;
@@ -701,7 +699,7 @@ CHAT PANEL
     color: var(--muted);
 }
 .composer .field:focus-within {
-    box-shadow: 0 0 0 1.5px var(--accent);
+    /* box-shadow: 0 0 0 1.5px var(--accent); */
 }
 
 .btn-send {
