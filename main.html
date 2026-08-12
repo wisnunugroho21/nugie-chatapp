@@ -3,112 +3,1179 @@
     <head>
         <title>Chatbot Coba</title>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"/>
-        <link rel="stylesheet" href="main.css">
+        <style>
+            @import url('https://googleapis.com');
+
+            /* ============================================================
+            TOKENS
+            ============================================================ */
+            :root {
+                --bg-deep: #0a1014;
+                --panel: #111b21;
+                --panel-2: #202c33;
+                --panel-3: #2a3942;
+                --border: #222e35;
+                --text: #e9edef;
+                --muted: #8696a0;
+                --accent: #00a884;
+                --bubble-out: #005c4b;
+                --bubble-in: #202c33;
+                --tick: #53bdeb;
+                --radius: 8px;
+                --sidebar-w: 400px;
+                --header-h: 60px;
+                font-synthesis-weight: none;
+            }
+
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            html,
+            body {
+                height: 100%;
+            }
+
+            body {
+                background: var(--bg-deep);
+                color: var(--text);
+                font-family: 'Roboto Flex', 'Roboto', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                font-size: 14.5px;
+                line-height: 1.4;
+                -webkit-font-smoothing: antialiased;
+                display: grid;
+                place-items: center;
+                overflow: hidden;
+            }
+
+            button {
+                font: inherit;
+                color: inherit;
+                background: none;
+                border: 0;
+                cursor: pointer;
+            }
+
+            input {
+                font: inherit;
+                color: inherit;
+                background: none;
+                border: 0;
+                outline: 0;
+            }
+
+            :focus-visible {
+                /* outline: 2px solid var(--accent);
+                outline-offset: 2px;
+                border-radius: 4px; */
+            }
+
+            /* Icon defaults: every icon is a stroked SVG, sized from font-size */
+            .i {
+                width: 24px;
+                height: 24px;
+                display: block;
+                fill: none;
+                stroke: currentColor;
+                stroke-width: 1.8;
+                stroke-linecap: round;
+                stroke-linejoin: round;
+            }
+
+            .i-sm {
+                width: 16px;
+                height: 16px;
+                stroke-width: 2;
+            }
+
+            /* ============================================================
+            APP SHELL
+            ============================================================ */
+            .app {
+                width: 100%;
+                height: 100%;
+                display: grid;
+                grid-template-columns: minmax(300px, var(--sidebar-w)) 1fr;
+                background: var(--panel);
+                overflow: hidden;
+            }
+
+
+            /* Pane toggle for narrow screens (no JS) */
+            #pane-toggle {
+                position: absolute;
+                opacity: 0;
+                pointer-events: none;
+            }
+
+            /* ============================================================
+            SIDEBAR
+            ============================================================ */
+            .sidebar {
+                display: flex;
+                flex-direction: column;
+                min-width: 0;
+                border-right: 1px solid var(--border);
+                background: var(--panel);
+            }
+
+            .side-head {
+                height: var(--header-h);
+                flex: 0 0 var(--header-h);
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                padding: 0 16px;
+                background: var(--panel-2);
+            }
+
+            .side-head .spacer {
+                flex: 1;
+            }
+
+            .icon-btn {
+                width: 40px;
+                height: 40px;
+                display: grid;
+                place-items: center;
+                border-radius: 50%;
+                color: var(--muted);
+                transition:
+                    background 0.15s ease,
+                    color 0.15s ease;
+            }
+
+            .icon-btn:hover {
+                background: #ffffff14;
+                color: var(--text);
+            }
+
+            /* --- Search --- */
+            .search-wrap {
+                padding: 8px 12px;
+                background: var(--panel);
+            }
+
+            .search {
+                display: flex;
+                align-items: center;
+                gap: 14px;
+                height: 38px;
+                padding: 0 14px;
+                background: var(--panel-2);
+                border-radius: 8px;
+                color: var(--muted);
+            }
+
+            .search:focus-within {
+                /*box-shadow: inset 0 0 0 1.5px var(--accent);*/
+            }
+
+            .search input {
+                flex: 1;
+                min-width: 0;
+                font-size: 14px;
+                color: var(--text);
+            }
+
+            .search input::placeholder {
+                color: var(--muted);
+            }
+
+            /* --- Filter chips --- */
+            .filters {
+                display: flex;
+                gap: 8px;
+                padding: 0 12px 10px;
+                overflow-x: auto;
+                scrollbar-width: none;
+            }
+
+            .filters::-webkit-scrollbar {
+                display: none;
+            }
+
+            .chip {
+                flex: 0 0 auto;
+                padding: 5px 13px;
+                border-radius: 999px;
+                background: var(--panel-2);
+                color: var(--muted);
+                font-size: 13.5px;
+                white-space: nowrap;
+                transition: background 0.15s ease;
+            }
+
+            .chip:hover {
+                background: var(--panel-3);
+            }
+
+            .chip[aria-pressed="true"] {
+                background: #0a3d35;
+                color: #a7e8d8;
+            }
+
+            /* --- Chat list --- */
+            .chat-list {
+                flex: 1;
+                overflow-y: auto;
+                overscroll-behavior: contain;
+            }
+
+            .chat-list::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            .chat-list::-webkit-scrollbar-thumb {
+                background: #374248;
+                border-radius: 3px;
+            }
+
+            .chat-list::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            .chat-item {
+                display: flex;
+                align-items: center;
+                gap: 14px;
+                padding: 10px 14px 10px 16px;
+                cursor: pointer;
+                transition: background 0.12s ease;
+                border-top: 1px solid var(--border);
+            }
+
+            .chat-item:hover {
+                background: var(--panel-2);
+            }
+
+            .chat-item.is-active {
+                background: var(--panel-3);
+            }
+
+            .chat-item+.chat-item .ci-body {
+                /* border-top: 1px solid var(--border); */
+            }
+
+            .chat-item:hover+.chat-item .ci-body,
+            .chat-item.is-active+.chat-item .ci-body {
+                /* border-top-color: transparent; */
+            }
+
+            .avatar {
+                flex: 0 0 49px;
+                width: 49px;
+                height: 49px;
+                border-radius: 50%;
+                display: grid;
+                place-items: center;
+                font-size: 17px;
+                font-weight: 600;
+                letter-spacing: 0.5px;
+                color: #0b141a;
+                user-select: none;
+            }
+
+            .a1 {
+                background: linear-gradient(145deg, #00a884, #00d9a5);
+            }
+
+            .a2 {
+                background: linear-gradient(145deg, #7f66ff, #a48bff);
+            }
+
+            .a3 {
+                background: linear-gradient(145deg, #e542a3, #ff7ac2);
+            }
+
+            .a4 {
+                background: linear-gradient(145deg, #ffa726, #ffcf7a);
+            }
+
+            .a5 {
+                background: linear-gradient(145deg, #53bdeb, #8ed8f7);
+            }
+
+            .a6 {
+                background: linear-gradient(145deg, #06cf9c, #5ce8c3);
+            }
+
+            .ci-body {
+                flex: 1;
+                min-width: 0;
+                display: grid;
+                grid-template-columns: 1fr auto;
+                gap: 2px 8px;
+                padding: 5px 0px;
+            }
+
+            .ci-name {
+                grid-column: 1;
+                font-size: 16.5px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .ci-time {
+                grid-column: 2;
+                font-size: 12px;
+                color: var(--muted);
+                white-space: nowrap;
+                align-self: center;
+            }
+
+            .ci-msg {
+                grid-column: 1;
+                display: flex;
+                align-items: center;
+                gap: 4px;
+                font-size: 13.5px;
+                color: var(--muted);
+                white-space: nowrap;
+                overflow: hidden;
+            }
+
+            .ci-msg .material-symbols-outlined {
+                font-size: 16px;
+            }
+
+            .ci-msg span {
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .ci-meta {
+                grid-column: 2;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                justify-self: end;
+            }
+
+            .badge {
+                min-width: 20px;
+                height: 20px;
+                padding: 0 6px;
+                border-radius: 10px;
+                background: var(--accent);
+                color: #0b141a;
+                font-size: 12px;
+                font-weight: 600;
+                display: grid;
+                place-items: center;
+            }
+
+            .muted-icon {
+                color: var(--muted);
+            }
+
+            .tick {
+                color: var(--muted);
+                flex: 0 0 auto;
+            }
+
+            .tick.read {
+                color: var(--tick);
+            }
+
+            .is-unread .ci-msg {
+                color: var(--text);
+            }
+
+            /* ============================================================
+            CHAT PANEL
+            ============================================================ */
+            .chat {
+                display: flex;
+                flex-direction: column;
+                min-width: 0;
+                position: relative;
+                background: #0b141a;
+            }
+
+            /* Doodle wallpaper — hand-drawn marks, kept near-invisible */
+            .chat::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260' viewBox='0 0 260 260'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='0.045' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='34' cy='40' r='11'/%3E%3Cpath d='M96 28l13 13-13 13-13-13z'/%3E%3Cpath d='M150 34h26M150 44h18'/%3E%3Cpath d='M212 26c8 0 12 6 12 12s-6 12-14 12h-4l-8 7v-7c-4-2-6-6-6-12 0-6 6-12 20-12z'/%3E%3Cpath d='M28 104c6-8 16-8 22 0M24 118h34'/%3E%3Cpath d='M92 96l10 22-22-8z'/%3E%3Ccircle cx='158' cy='108' r='9'/%3E%3Cpath d='M150 124h18'/%3E%3Cpath d='M206 100v22M198 110h18'/%3E%3Cpath d='M34 178h24v18H42l-8 7z'/%3E%3Cpath d='M104 172c8-6 16 2 10 10l-12 14-12-14c-6-8 6-16 14-10z'/%3E%3Cpath d='M152 186h24M164 176v20'/%3E%3Cpath d='M204 172l14 8-14 8z'/%3E%3Ccircle cx='70' cy='232' r='8'/%3E%3Cpath d='M120 226h30v16h-30z'/%3E%3Cpath d='M188 224v20M182 244h14'/%3E%3C/g%3E%3C/svg%3E");
+                opacity: 0.9;
+                pointer-events: none;
+            }
+
+            .chat-head {
+                position: relative;
+                z-index: 1;
+                height: var(--header-h);
+                flex: 0 0 var(--header-h);
+                display: flex;
+                align-items: center;
+                gap: 14px;
+                padding: 0 16px;
+                background: var(--panel-2);
+            }
+
+            .chat-head .avatar {
+                flex-basis: 40px;
+                width: 40px;
+                height: 40px;
+                font-size: 15px;
+            }
+
+            .ch-info {
+                flex: 1;
+                min-width: 0;
+                cursor: pointer;
+            }
+
+            .ch-name {
+                font-size: 16px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .ch-sub {
+                font-size: 12.5px;
+                color: var(--muted);
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .back-btn.material-symbols-outlined {
+                display: none;
+            }
+
+            /* --- Messages --- */
+            .thread {
+                z-index: 1;
+                flex: 1 1 0;
+                min-height: 0;
+                overflow-y: auto;
+                overscroll-behavior: contain;
+                padding: 14px 6%;
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .thread::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            .thread::-webkit-scrollbar-thumb {
+                background: #374248;
+                border-radius: 3px;
+            }
+
+            .thread::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            .pill {
+                align-self: center;
+                margin: 10px 0;
+                padding: 6px 13px;
+                border-radius: 8px;
+                background: #182229;
+                color: var(--muted);
+                font-size: 12.2px;
+                text-transform: uppercase;
+                letter-spacing: 0.3px;
+                box-shadow: 0 1px 1px #00000024;
+            }
+
+            .pill.notice {
+                text-transform: none;
+                letter-spacing: 0;
+                background: #182229;
+                color: #ffd279;
+                max-width: 520px;
+                text-align: center;
+                line-height: 1.5;
+            }
+
+            .row {
+                display: flex;
+                margin-top: 3px;
+            }
+
+            .row.in {
+                justify-content: flex-start;
+            }
+
+            .row.out {
+                justify-content: flex-end;
+            }
+
+            .row.first {
+                /* margin-top: 12px; */
+            }
+
+            .bubble {
+                position: relative;
+                max-width: min(75%, 560px);
+                padding: 6px 9px 8px 10px;
+                border-radius: 8px;
+                box-shadow: 0 1px 0.5px rgba(11, 20, 26, 0.18);
+                word-wrap: break-word;
+                width: fit-content;
+            }
+
+            .in .bubble {
+                background: var(--bubble-in);
+                border-top-left-radius: 8px;
+            }
+
+            .out .bubble {
+                background: var(--bubble-out);
+                border-top-right-radius: 8px;
+            }
+
+            .first.in .bubble {
+                border-top-left-radius: 0;
+            }
+
+            .first.out .bubble {
+                border-top-right-radius: 0;
+            }
+
+            .bubble .text .material-symbols-outlined {
+                font-size: 16px;
+            }
+
+            /* Bubble tails */
+            .first .bubble::after {
+                content: "";
+                position: absolute;
+                top: 0;
+                border: 11px solid transparent;
+            }
+
+            .first.in .bubble::after {
+                left: -10px;
+                border-top-color: var(--bubble-in);
+                border-right: 0;
+            }
+
+            .first.out .bubble::after {
+                right: -10px;
+                border-top-color: var(--bubble-out);
+                border-left: 0;
+            }
+
+            .sender {
+                font-size: 13px;
+                font-weight: 500;
+                margin-bottom: 2px;
+            }
+
+            .s1 {
+                color: #53bdeb;
+            }
+
+            .s2 {
+                color: #e542a3;
+            }
+
+            .s3 {
+                color: #ffa726;
+            }
+
+            .text {
+                font-size: 14.5px;
+            }
+
+            .meta {
+                display: flex;
+                justify-content: end;
+                align-items: center;
+                gap: 3px;
+                font-size: 11px;
+                color: #ffffff8a;
+                white-space: nowrap;
+                margin-top: 4px;
+            }
+
+            .out .meta {
+                color: #ffffff99;
+            }
+
+            /* Quoted reply */
+            .quote {
+                display: block;
+                margin-top: 4px;
+                margin-bottom: 4px;
+                padding: 5px 8px;
+                border-left: 4px solid #53bdeb;
+                border-radius: 4px;
+                background: #ffffff12;
+                font-size: 13.5px;
+            }
+
+            .out .quote {
+                background: #00000026;
+                border-left-color: #a7e8d8;
+            }
+
+            .quote b {
+                display: block;
+                color: #53bdeb;
+                font-weight: 500;
+                margin-bottom: 1px;
+            }
+
+            .out .quote b {
+                color: #a7e8d8;
+            }
+
+            .quote span {
+                color: #ffffff9e;
+            }
+
+            /* Voice note */
+            .voice {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                min-width: 230px;
+                padding-right: 0;
+            }
+
+            .voice .avatar {
+                flex-basis: 36px;
+                width: 36px;
+                height: 36px;
+                font-size: 13px;
+            }
+
+            .wave {
+                flex: 1;
+                height: 22px;
+                display: flex;
+                align-items: center;
+                gap: 2.5px;
+            }
+
+            .wave i {
+                flex: 1;
+                background: var(--muted);
+                border-radius: 2px;
+            }
+
+            .wave i:nth-child(3n) {
+                background: var(--accent);
+            }
+
+            .wave i:nth-child(1) {
+                height: 30%;
+            }
+
+            .wave i:nth-child(2) {
+                height: 65%;
+            }
+
+            .wave i:nth-child(3) {
+                height: 95%;
+            }
+
+            .wave i:nth-child(4) {
+                height: 45%;
+            }
+
+            .wave i:nth-child(5) {
+                height: 80%;
+            }
+
+            .wave i:nth-child(6) {
+                height: 35%;
+            }
+
+            .wave i:nth-child(7) {
+                height: 100%;
+            }
+
+            .wave i:nth-child(8) {
+                height: 55%;
+            }
+
+            .wave i:nth-child(9) {
+                height: 25%;
+            }
+
+            .wave i:nth-child(10) {
+                height: 70%;
+            }
+
+            .wave i:nth-child(11) {
+                height: 40%;
+            }
+
+            .wave i:nth-child(12) {
+                height: 60%;
+            }
+
+            /* Typing indicator */
+            .typing {
+                display: flex;
+                gap: 4px;
+                padding: 6px 2px;
+            }
+
+            .typing i {
+                width: 7px;
+                height: 7px;
+                border-radius: 50%;
+                background: var(--muted);
+                animation: blink 1.3s infinite ease-in-out;
+            }
+
+            .typing i:nth-child(2) {
+                animation-delay: 0.18s;
+            }
+
+            .typing i:nth-child(3) {
+                animation-delay: 0.36s;
+            }
+
+            @keyframes blink {
+
+                0%,
+                60%,
+                100% {
+                    opacity: 0.35;
+                    transform: translateY(0);
+                }
+
+                30% {
+                    opacity: 1;
+                    transform: translateY(-3px);
+                }
+            }
+
+            /* --- Composer --- */
+            .composer {
+                position: relative;
+                z-index: 1;
+                flex: 0 0 auto;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 8px 16px;
+                background: var(--panel-2);
+            }
+
+            .composer .field {
+                flex: 1;
+                min-width: 0;
+                display: flex;
+                align-items: center;
+                height: 42px;
+                padding: 0 14px;
+                background: var(--panel-3);
+                border-radius: 8px;
+            }
+
+            .composer .field input {
+                width: 100%;
+                font-size: 15px;
+            }
+
+            .composer .field input::placeholder {
+                color: var(--muted);
+            }
+
+            .composer .field:focus-within {
+                /* box-shadow: 0 0 0 1.5px var(--accent); */
+            }
+
+            .btn-send {
+                display: none;
+            }
+
+            .composer:has(.msg-input:not(:placeholder-shown)) .btn-send {
+                display: grid;
+                color: var(--accent);
+            }
+
+            /* the mic sits outside .field, so target it from the wrapper */
+            .composer:has(.msg-input:not(:placeholder-shown)) .btn-mic {
+                display: none;
+            }
+
+            /* ============================================================
+            RESPONSIVE — one pane at a time below 900px
+            ============================================================ */
+            @media (max-width: 900px) {
+                .app {
+                    grid-template-columns: 1fr;
+                    grid-template-rows: minmax(0, 1fr);
+                }
+
+                .sidebar,
+                .chat {
+                    min-height: 0;
+                    grid-area: 1/1;
+                }
+
+                .sidebar {
+                    border-right: 0;
+                }
+
+                .chat {
+                    display: none;
+                }
+
+                #pane-toggle:checked~.app .sidebar {
+                    display: none;
+                }
+
+                #pane-toggle:checked~.app .chat {
+                    display: flex;
+                }
+
+                .back-btn {
+                    display: grid;
+                    margin-left: -6px;
+                    margin-right: -6px;
+                }
+
+                .chat-head {
+                    gap: 10px;
+                    padding: 0 12px;
+                }
+
+                .thread {
+                    padding: 12px 4%;
+                }
+
+                .bubble {
+                    max-width: 85%;
+                }
+            }
+
+            @media (max-width: 420px) {
+                .side-head {
+                    padding: 0 10px;
+                }
+
+                .composer {
+                    padding: 8px 10px;
+                    gap: 4px;
+                }
+            }
+
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation: none !important;
+                    transition: none !important;
+                }
+            }
+
+        </style>
     </head>
     <body>
-        <div id="app" class="app">
+        <div class="app">
+            <!-- ==================== SIDEBAR ==================== -->
+            <aside class="sidebar">
+                <header class="side-head">
+                    <div class="avatar a1" aria-label="Your profile">NU</div>
+                    <div class="spacer"></div>
+                    <button class="icon-btn" aria-label="New chat">
+                        <span class="material-symbols-outlined">
+                            chat_add_on
+                        </span>
+                    </button>
+                    <button class="icon-btn" aria-label="Menu">
+                        <span class="material-symbols-outlined">
+                            more_vert
+                        </span>
+                    </button>
+                </header>
 
-            <!-- LEFT SECTION -->
-
-            <section id="main-left" class="main-left">
-                <!-- header -->
-                <div id="header-left" class="header-left">
-                    <div class="header-left-title">TMS</div>
-
-                </div>
-
-                <!-- chat list -->
-                <div id="chat-list" class="chat-list">
-                    <div class="search-area">
-                        <!-- attachment btn -->
-                        <div class="search-btn">
-                            <span class="material-symbols-outlined">search</span>
-                        </div>
-
-                        <!-- input form -->
-                        <input id="type-search-area" class="type-search-area" placeholder="Type something...">
-                    </div>
-
-                    <!-- user lists -->
-                    <div id="friends" class="friends">
-                        <!-- photo -->
-                        <div class="profile friends-photo">
-                            <img src="images/ava2.jpg" alt="">
-                        </div>
-
-                        <div class="friends-credent">
-                            <!-- name -->
-                            <span class="friends-name">Mario Gomez</span>
-                            <!-- last message -->
-                            <span class="friends-message">Crap! I forgot my shoes. Can you bring extra pair for me? Crap! I forgot my shoes. Can you bring extra pair for me?</span>
-                        </div>
-                        <!-- notification badge -->
-                        <span class="badge notif-badge">7</span>
-                    </div>
-                </div>
-            </section>
-
-            <!-- RIGHT SECTION -->
-
-            <section id="main-right" class="main-right">
-                <!-- header -->
-                <div id="header-right" class="header-right">
-                    <!-- profile pict -->
-                    <div id="header-img" class="profile header-img">
-                        <img src="images/ava2.jpg" alt="">
-                    </div>
-
-                    <!-- name -->
-                    <div class="friend-desc">
-                        <h4 class="name friend-name">Mario Gomez</h4>
-                        <p class="friend-status">Yo Dybala!</p>
-                    </div>
-
-                    <!-- some btn -->
-                    <div class="some-btn">
-                        <span class="material-symbols-outlined">headphones</span>
+                <div class="search-wrap">
+                    <div class="search">
+                        <span class="material-symbols-outlined">
+                            search
+                        </span>
+                        <input
+                            type="search"
+                            placeholder="Search or start a new chat"
+                            aria-label="Search chats"
+                        />
                     </div>
                 </div>
 
-                <!-- chat area -->
-                <div id="chat-area" class="chat-area">
-                    <!-- chat content -->
+                <div class="filters" role="group" aria-label="Filter chats">
+                    <button class="chip" aria-pressed="true">All</button>
+                    <button class="chip" aria-pressed="false">Unread</button>
+                </div>
 
-                    <!-- FRIENDS CHAT TEMPLATE -->
-                    <div id="friends-chat" class="friends-chat">
-                        <div class="profile friends-chat-photo">
-                            <img src="images/ava2.jpg" alt="">
+                <div class="chat-list" role="list">
+                    <label
+                        class="chat-item is-active is-unread"
+                        role="listitem"
+                    >
+                        <div class="avatar a1">DA</div>
+                        <div class="ci-body">
+                            <div class="ci-name">Dispatch Armada</div>
+                            <div class="ci-time" style="color: var(--accent)">
+                                14:12
+                            </div>
+                            <div class="ci-msg">
+                                <span>Pak Budi: ETA Cikampek 14.30</span>
+                            </div>
+                            <div class="ci-meta">
+                                <span class="badge">3</span>
+                            </div>
                         </div>
-                        <div class="friends-chat-content">
-                            <p class="friends-chat-name">Mario Gomez</p>
-                            <p class="friends-chat-balloon">Yo Dybala!</p>
-                            <h5 class="chat-datetime">Sun, Aug 30 | 15:41</h5>
+                    </label>
+
+                    <label class="chat-item" role="listitem">
+                        <div class="avatar a3">RP</div>
+                        <div class="ci-body">
+                            <div class="ci-name">Rina Prasetyo</div>
+                            <div class="ci-time">13:48</div>
+                            <div class="ci-msg">
+                                <span
+                                    >Laporan stamina driver sudah aku
+                                    kirim</span
+                                >
+                            </div>
+                            <div class="ci-meta"></div>
+                        </div>
+                    </label>
+
+                    <label class="chat-item" role="listitem">
+                        <div class="avatar a5">AQ</div>
+                        <div class="ci-body">
+                            <div class="ci-name">Andre — QA</div>
+                            <div class="ci-time">12:20</div>
+                            <div class="ci-msg">
+                                <span class="material-symbols-outlined">
+                                    done_all
+                                </span>
+                                <span>Deploy staging jam 5 ya</span>
+                            </div>
+                            <div class="ci-meta"></div>
+                        </div>
+                    </label>
+
+                    <label
+                        class="chat-item is-unread"
+                        role="listitem"
+                    >
+                        <div class="avatar a4">IB</div>
+                        <div class="ci-body">
+                            <div class="ci-name">Ibu</div>
+                            <div class="ci-time" style="color: var(--accent)">
+                                11:05
+                            </div>
+                            <div class="ci-msg">
+                                <span>Sudah makan siang belum?</span>
+                            </div>
+                            <div class="ci-meta">
+                                <span class="badge">1</span>
+                            </div>
+                        </div>
+                    </label>
+
+                    <label class="chat-item" role="listitem">
+                        <div class="avatar a6">WS</div>
+                        <div class="ci-body">
+                            <div class="ci-name">Warung Bu Sri</div>
+                            <div class="ci-time">09:30</div>
+                            <div class="ci-msg">
+                                <span class="material-symbols-outlined">
+                                    call
+                                </span>
+                                <span>0:12</span>
+                            </div>
+                            <div class="ci-meta"></div>
+                        </div>
+                    </label>
+
+                    <label class="chat-item" role="listitem">
+                        <div class="avatar a4">KI</div>
+                        <div class="ci-body">
+                            <div class="ci-name">Info Kost Melati</div>
+                            <div class="ci-time">Friday</div>
+                            <div class="ci-msg">
+                                <span class="material-symbols-outlined">
+                                    photo
+                                </span>
+                                <span>Photo</span>
+                            </div>
+                            <div class="ci-meta"></div>
+                        </div>
+                    </label>
+                </div>
+            </aside>
+
+            <!-- ==================== CHAT ==================== -->
+            <main class="chat">
+                <div class="chat-head">
+                    <span class="back-btn material-symbols-outlined">
+                        arrow_left_alt
+                    </span>
+                    <div class="avatar a1">DA</div>
+                    <div class="ch-info">
+                        <div class="ch-name">Dispatch Armada</div>
+                        <div class="ch-sub">You, Pak Budi, Rina, Fajar, +6</div>
+                    </div>
+                    <button class="icon-btn" aria-label="Video call">
+                        <span class="material-symbols-outlined">
+                            call
+                        </span>
+                    </button>
+                    <button class="icon-btn" aria-label="Menu">
+                        <span class="material-symbols-outlined">
+                            more_vert
+                        </span>
+                    </button>
+                </div>
+
+                <div id="chat_thread" class="thread">
+                    <div class="pill">Today</div>
+                    <div class="pill notice">
+                        Messages are end-to-end encrypted. No one outside this
+                        chat can read them.
+                    </div>
+
+                    <div class="row in first">
+                        <div class="bubble">
+                            <div class="sender s1">Pak Budi</div>
+                            <div class="text">
+                                Unit B 9021 FF selesai loading di gudang
+                                Marunda. Segel sudah dipasang.
+                                <span class="meta">14:02</span>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- YOUR CHAT TEMPLATE -->
-                    <div id="your-chat" class="your-chat">
-                        <p class="your-chat-balloon">'sup</p>
-                        <p class="chat-datetime"><span class="glyphicon glyphicon-ok"></span> Sun, Aug 30 | 15:45</p>
+                    <div class="row in">
+                        <div class="bubble">
+                            <div class="text">
+                                Surat jalan sudah discan, tolong dicek di sistem
+                                ya.
+                                <span class="meta">14:03</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row out first">
+                        <div class="bubble">
+                            <div class="text">
+                                Sudah masuk, Pak. Statusnya otomatis pindah ke
+                                <b>IN TRANSIT</b> begitu surat jalan
+                                tervalidasi.
+                                <span class="meta">
+                                    14:05
+                                    <span class="material-symbols-outlined">
+                                        done_all
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row in first">
+                        <div class="bubble">
+                            <div class="sender s2">Rina Prasetyo</div>
+                            <div class="quote">
+                                <b>You</b>
+                                    <span>Statusnya otomatis pindah ke IN
+                                    TRANSIT…</span>
+                            </div>
+                            <div class="text">
+                                Drivernya siapa? Perlu aku update di dashboard
+                                stamina.
+                                <span class="meta">14:08</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row out first">
+                        <div class="bubble">
+                            <div class="text">
+                                Pak Slamet. Istirahat terakhir 11:40, jadi jam
+                                kerjanya masih aman sampai sore.
+                                <span class="meta"
+                                    >14:09
+                                    <span class="material-symbols-outlined">
+                                        done_all
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row in first">
+                        <div class="bubble">
+                            <div class="sender s3">Fajar</div>
+                            <div class="text">
+                                Noted. Aku pantau dari panel dispatch.
+                                <span class="meta">14:11</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row in first">
+                        <div class="bubble">
+                            <div class="sender s1">Pak Budi</div>
+                            <div class="text">
+                                Siap. ETA Cikampek 14:30, nanti saya kabari lagi
+                                kalau sudah lewat tol.
+                                <span class="meta">14:12</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row in first">
+                        <div class="bubble">
+                            <div class="typing" aria-label="Rina is typing">
+                                <i></i><i></i><i></i>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- typing area -->
-                <div id="typing-area" class="typing-area">
-                    <div class="input-area">
-                        <!-- input form -->
-                        <input id="type-area" class="type-area" placeholder="Type something...">
-                        <!-- attachment btn -->
-                        <div class="attach-btn">
-                            <span class="material-symbols-outlined btn">attach_file</span>
-                        </div>
+                <div class="composer">
+                    <button class="icon-btn" aria-label="Attach file">
+                        <span class="material-symbols-outlined">
+                            attach_file
+                        </span>
+                    </button>
+                    <div class="field">
+                        <input
+                            class="msg-input"
+                            type="text"
+                            placeholder="Type a message"
+                            aria-label="Type a message"
+                        />
                     </div>
-                    <!-- send btn -->
-                    <div class="send-area">
-                        <span class="material-symbols-outlined send-btn btn">send</span>
-                    </div>
+                    <button
+                        class="icon-btn btn-mic"
+                        aria-label="Record voice message"
+                    >
+                        <span class="material-symbols-outlined">
+                            mic
+                        </span>
+                    </button>
+                    <button class="icon-btn btn-send" aria-label="Send message">
+                        <span class="material-symbols-outlined">
+                            send
+                        </span>
+                    </button>
                 </div>
-            </section>
+            </main>
         </div>
     </body>
 </html>
