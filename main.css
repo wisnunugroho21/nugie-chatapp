@@ -103,13 +103,6 @@ APP SHELL
     overflow: hidden;
 }
 
-/* Pane toggle for narrow screens (no JS) */
-#pane-toggle {
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
-}
-
 /* ============================================================
 SIDEBAR
 ============================================================ */
@@ -398,16 +391,8 @@ NEW CHAT PANEL  (slides over the sidebar)
     flex-direction: column;
     background: var(--panel);
     box-shadow: 0 0 24px #00000066;
-    transform: translateX(-102%);
-    visibility: hidden;
-    transition:
-        transform 0.22s ease,
-        visibility 0.22s ease;
-}
-
-.new-chat.open {
-    transform: none;
-    visibility: visible;
+    /* Closed by default via the inline style on the element.
+       Opening, closing and the slide are all driven from JS. */
 }
 
 .np-head {
@@ -513,7 +498,7 @@ NEW CHAT PANEL  (slides over the sidebar)
 }
 
 .c-check {
-    display: none;
+    display: grid;
     width: 22px;
     height: 22px;
     border-radius: 50%;
@@ -524,12 +509,8 @@ NEW CHAT PANEL  (slides over the sidebar)
     font-weight: 700;
 }
 
-.new-chat.group-mode .contact.sel {
+.contact.sel {
     background: var(--panel-2);
-}
-
-.new-chat.group-mode .contact.sel .c-check {
-    display: grid;
 }
 
 .np-empty {
@@ -541,16 +522,12 @@ NEW CHAT PANEL  (slides over the sidebar)
 }
 
 .np-foot {
-    display: none;
+    display: flex;
     flex-direction: column;
     gap: 10px;
     padding: 10px 14px 12px;
     background: var(--panel-2);
     border-top: 1px solid var(--border);
-}
-
-.new-chat.group-mode .np-foot {
-    display: flex;
 }
 
 .np-chips {
@@ -562,8 +539,7 @@ NEW CHAT PANEL  (slides over the sidebar)
     scrollbar-width: none;
 }
 
-.np-chips:empty::after {
-    content: "Pick the people to add";
+.np-hint {
     color: var(--muted);
     font-size: 13px;
 }
@@ -1109,18 +1085,6 @@ RESPONSIVE — one pane at a time below 900px
 
     .sidebar {
         border-right: 0;
-    }
-
-    .chat {
-        display: none;
-    }
-
-    #pane-toggle:checked ~ .app .sidebar {
-        display: none;
-    }
-
-    #pane-toggle:checked ~ .app .chat {
-        display: flex;
     }
 
     .back-btn {

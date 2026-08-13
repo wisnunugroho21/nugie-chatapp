@@ -6,15 +6,9 @@
             rel="stylesheet"
             href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
         />
-        <link rel="stylesheet" href="style.css" />
+        <link rel="stylesheet" href="main.css" />
     </head>
     <body>
-        <input
-            type="checkbox"
-            id="pane-toggle"
-            tabindex="-1"
-            aria-hidden="true"
-        />
         <div class="app">
             <!-- ==================== SIDEBAR ==================== -->
             <aside class="sidebar">
@@ -54,9 +48,10 @@
                 </div>
 
                 <div class="chat-list" role="list">
-                    <label
+                    <div
                         class="chat-item is-active is-unread"
                         role="listitem"
+                        tabindex="0"
                         data-name="Dispatch Armada"
                         data-sub="You, Pak Budi, Rina, Fajar, +6"
                     >
@@ -73,11 +68,12 @@
                                 <span class="badge">3</span>
                             </div>
                         </div>
-                    </label>
+                    </div>
 
-                    <label
+                    <div
                         class="chat-item"
                         role="listitem"
+                        tabindex="0"
                         data-name="Rina Prasetyo"
                         data-sub="online"
                     >
@@ -93,11 +89,12 @@
                             </div>
                             <div class="ci-meta"></div>
                         </div>
-                    </label>
+                    </div>
 
-                    <label
+                    <div
                         class="chat-item"
                         role="listitem"
+                        tabindex="0"
                         data-name="Andre — QA"
                         data-sub="last seen today at 12:24"
                     >
@@ -113,11 +110,12 @@
                             </div>
                             <div class="ci-meta"></div>
                         </div>
-                    </label>
+                    </div>
 
-                    <label
+                    <div
                         class="chat-item is-unread"
                         role="listitem"
+                        tabindex="0"
                         data-name="Ibu"
                         data-sub="last seen today at 11:06"
                     >
@@ -134,11 +132,12 @@
                                 <span class="badge">1</span>
                             </div>
                         </div>
-                    </label>
+                    </div>
 
-                    <label
+                    <div
                         class="chat-item"
                         role="listitem"
+                        tabindex="0"
                         data-name="Warung Bu Sri"
                         data-sub="last seen today at 09:31"
                     >
@@ -154,11 +153,12 @@
                             </div>
                             <div class="ci-meta"></div>
                         </div>
-                    </label>
+                    </div>
 
-                    <label
+                    <div
                         class="chat-item"
                         role="listitem"
+                        tabindex="0"
                         data-name="Info Kost Melati"
                         data-sub="You, Pak Herman, Dewi, +12"
                     >
@@ -174,7 +174,7 @@
                             </div>
                             <div class="ci-meta"></div>
                         </div>
-                    </label>
+                    </div>
                 </div>
 
                 <!-- ============ NEW CHAT PANEL ============ -->
@@ -183,6 +183,7 @@
                     id="newChat"
                     aria-label="New chat"
                     aria-hidden="true"
+                    style="transform: translateX(-102%); visibility: hidden"
                 >
                     <header class="side-head np-head">
                         <button
@@ -218,7 +219,7 @@
 
                     <div class="np-list" id="ncList"></div>
 
-                    <footer class="np-foot">
+                    <footer class="np-foot" id="ncFoot" style="display: none">
                         <div class="np-chips" id="ncChips"></div>
                         <div class="np-make">
                             <div class="field">

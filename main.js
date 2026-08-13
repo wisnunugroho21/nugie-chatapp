@@ -5,7 +5,8 @@
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 
   /* ---------- Elements ---------- */
-  const paneToggle = $("#pane-toggle");
+  const sidebar = $(".sidebar");
+  const chatPane = $(".chat");
   const chatList = $(".chat-list");
   const thread = $("#chat_thread");
   const headName = $(".ch-name");
@@ -15,6 +16,7 @@
   const sendBtn = $(".btn-send");
 
   const panel = $("#newChat");
+  const ncFoot = $("#ncFoot");
   const ncList = $("#ncList");
   const ncSearch = $("#ncSearch");
   const ncTitle = $("#ncTitle");
@@ -65,6 +67,31 @@
   const byName = (n) =>
     chatList.querySelector(`.chat-item[data-name="${CSS.escape(n)}"]`);
 
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  /* ---------- Which pane is on screen (narrow layout) ---------- */
+  const narrow = window.matchMedia("(max-width: 900px)");
+  let pane = "list"; // "list" | "chat"
+
+  function applyPane() {
+    if (narrow.matches) {
+      sidebar.style.display = pane === "list" ? "flex" : "none";
+      chatPane.style.display = pane === "chat" ? "flex" : "none";
+    } else {
+      // Wide layout: both panes stay side by side.
+      sidebar.style.display = "flex";
+      chatPane.style.display = "flex";
+    }
+  }
+
+  function showPane(which) {
+    pane = which;
+    applyPane();
+  }
+
+  narrow.addEventListener("change", applyPane);
+  applyPane();
+
   /* ---------- Thread store ---------- */
   let current = "Dispatch Armada";
   const threads = new Map([[current, thread.innerHTML]]);
@@ -104,7 +131,7 @@
     thread.scrollTop = thread.scrollHeight;
 
     current = name;
-    paneToggle.checked = true; // shows the chat pane on narrow screens
+    showPane("chat");
     msgInput.focus({ preventScroll: true });
   }
 
@@ -113,7 +140,15 @@
     if (item) openChat(item);
   });
 
-  $("#btnBack").addEventListener("click", () => (paneToggle.checked = false));
+  chatList.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    const item = e.target.closest(".chat-item");
+    if (!item) return;
+    e.preventDefault();
+    openChat(item);
+  });
+
+  $("#btnBack").addEventListener("click", () => showPane("list"));
 
   /* ---------- Create / reuse a chat list item ---------- */
   function ensureChatItem({ name, av, sub, preview }) {
@@ -122,9 +157,10 @@
       chatList.prepend(item);
       return item;
     }
-    item = document.createElement("label");
+    item = document.createElement("div");
     item.className = "chat-item";
     item.setAttribute("role", "listitem");
+    item.tabIndex = 0;
     item.dataset.name = name;
     item.dataset.sub = sub || "online";
     item.innerHTML = `
@@ -141,27 +177,58 @@
 
   /* ---------- New chat panel ---------- */
   let groupMode = false;
+  let panelOpen = false;
+  let slide = null;
+  const SLIDE_MS = 220;
   const selected = new Map(); // name -> contact
+
+  // The slide in/out, and the final resting state, come from here —
+  // no state classes, no :checked, no transition rules.
+  function slidePanel(open) {
+    if (slide) slide.cancel();
+    const from = open ? "translateX(-102%)" : "translateX(0)";
+    const to = open ? "translateX(0)" : "translateX(-102%)";
+
+    panel.style.visibility = "visible";
+    slide = panel.animate([{ transform: from }, { transform: to }], {
+      duration: reduceMotion.matches ? 0 : SLIDE_MS,
+      easing: "ease",
+    });
+    slide.onfinish = () => {
+      panel.style.transform = to;
+      panel.style.visibility = open ? "visible" : "hidden";
+      slide = null;
+    };
+  }
 
   function openPanel(group) {
     groupMode = !!group;
     selected.clear();
     ncSearch.value = "";
     ncGroupName.value = "";
-    panel.classList.toggle("group-mode", groupMode);
-    panel.classList.add("open");
-    panel.setAttribute("aria-hidden", "false");
+    ncFoot.style.display = groupMode ? "flex" : "none";
     ncTitle.textContent = groupMode ? "New group" : "New chat";
     ncSub.textContent = groupMode
       ? "Add members, then name the group"
       : "Pick someone to message";
     renderChips();
     renderContacts();
-    setTimeout(() => ncSearch.focus({ preventScroll: true }), 180);
+
+    if (!panelOpen) {
+      panelOpen = true;
+      slidePanel(true);
+    }
+    panel.setAttribute("aria-hidden", "false");
+    setTimeout(
+      () => ncSearch.focus({ preventScroll: true }),
+      reduceMotion.matches ? 0 : SLIDE_MS,
+    );
   }
 
   function closePanel() {
-    panel.classList.remove("open");
+    if (!panelOpen) return;
+    panelOpen = false;
+    slidePanel(false);
     panel.setAttribute("aria-hidden", "true");
   }
 
@@ -171,19 +238,20 @@
     else closePanel();
   });
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && panel.classList.contains("open")) closePanel();
+    if (e.key === "Escape" && panelOpen) closePanel();
   });
 
   function contactRow(c) {
-    const sel = selected.has(c.name) ? " sel" : "";
+    const picked = groupMode && selected.has(c.name);
     return `
-            <button class="contact${sel}" type="button" data-contact="${esc(c.name)}">
+            <button class="contact${picked ? " sel" : ""}" type="button"
+                    aria-pressed="${picked}" data-contact="${esc(c.name)}">
                 <div class="avatar ${c.av}">${esc(initials(c.name))}</div>
                 <div class="c-body">
                     <div class="c-name">${esc(c.name)}</div>
                     <div class="c-about">${esc(c.about)}</div>
                 </div>
-                <span class="c-check material-symbols-outlined">check</span>
+                ${picked ? '<span class="c-check material-symbols-outlined">check</span>' : ""}
             </button>`;
   }
 
@@ -238,7 +306,7 @@
     if (groupMode) {
       if (selected.has(c.name)) selected.delete(c.name);
       else selected.set(c.name, c);
-      btn.classList.toggle("sel", selected.has(c.name));
+      markRow(btn, selected.has(c.name));
       renderChips();
     } else {
       startChat(c);
@@ -257,7 +325,29 @@
   }
 
   /* ---------- Group mode ---------- */
+  function markRow(btn, picked) {
+    btn.classList.toggle("sel", picked);
+    btn.setAttribute("aria-pressed", String(picked));
+    const check = btn.querySelector(".c-check");
+    if (picked && !check) {
+      const span = document.createElement("span");
+      span.className = "c-check material-symbols-outlined";
+      span.textContent = "check";
+      btn.appendChild(span);
+    } else if (!picked && check) {
+      check.remove();
+    }
+  }
+
   function renderChips() {
+    if (!selected.size) {
+      ncChips.innerHTML = '<span class="np-hint">Pick the people to add</span>';
+      ncSub.textContent = groupMode
+        ? "Add members, then name the group"
+        : "Pick someone to message";
+      ncCreate.disabled = true;
+      return;
+    }
     ncChips.innerHTML = Array.from(selected.values())
       .map(
         (c) => `
@@ -270,12 +360,8 @@
                 </span>`,
       )
       .join("");
-    ncSub.textContent = groupMode
-      ? selected.size
-        ? `${selected.size} of ${CONTACTS.length} selected`
-        : "Add members, then name the group"
-      : "Pick someone to message";
-    ncCreate.disabled = selected.size < 1;
+    ncSub.textContent = `${selected.size} of ${CONTACTS.length} selected`;
+    ncCreate.disabled = false;
   }
 
   ncChips.addEventListener("click", (e) => {
