@@ -1,4 +1,4 @@
-@import url('https://googleapis.com');
+@import url("https://googleapis.com");
 
 /* ============================================================
 TOKENS
@@ -35,7 +35,14 @@ body {
 body {
     background: var(--bg-deep);
     color: var(--text);
-    font-family: 'Roboto Flex', 'Roboto', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family:
+        "Roboto Flex",
+        "Roboto",
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
     font-size: 14.5px;
     line-height: 1.4;
     -webkit-font-smoothing: antialiased;
@@ -95,7 +102,6 @@ APP SHELL
     background: var(--panel);
     overflow: hidden;
 }
-
 
 /* Pane toggle for narrow screens (no JS) */
 #pane-toggle {
@@ -251,12 +257,12 @@ SIDEBAR
     background: var(--panel-3);
 }
 
-.chat-item+.chat-item .ci-body {
+.chat-item + .chat-item .ci-body {
     /* border-top: 1px solid var(--border); */
 }
 
-.chat-item:hover+.chat-item .ci-body,
-.chat-item.is-active+.chat-item .ci-body {
+.chat-item:hover + .chat-item .ci-body,
+.chat-item.is-active + .chat-item .ci-body {
     /* border-top-color: transparent; */
 }
 
@@ -1023,7 +1029,6 @@ CHAT PANEL
 }
 
 @keyframes blink {
-
     0%,
     60%,
     100% {
@@ -1110,11 +1115,11 @@ RESPONSIVE — one pane at a time below 900px
         display: none;
     }
 
-    #pane-toggle:checked~.app .sidebar {
+    #pane-toggle:checked ~ .app .sidebar {
         display: none;
     }
 
-    #pane-toggle:checked~.app .chat {
+    #pane-toggle:checked ~ .app .chat {
         display: flex;
     }
 
@@ -1150,7 +1155,6 @@ RESPONSIVE — one pane at a time below 900px
 }
 
 @media (prefers-reduced-motion: reduce) {
-
     *,
     *::before,
     *::after {

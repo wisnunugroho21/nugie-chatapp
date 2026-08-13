@@ -1,19 +1,31 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
     <head>
         <title>Chatbot Coba</title>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"/>
+        <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+        />
         <link rel="stylesheet" href="style.css" />
     </head>
     <body>
-        <input type="checkbox" id="pane-toggle" tabindex="-1" aria-hidden="true" />
+        <input
+            type="checkbox"
+            id="pane-toggle"
+            tabindex="-1"
+            aria-hidden="true"
+        />
         <div class="app">
             <!-- ==================== SIDEBAR ==================== -->
             <aside class="sidebar">
                 <header class="side-head">
                     <div class="avatar a1" aria-label="Your profile">NU</div>
                     <div class="spacer"></div>
-                    <button class="icon-btn" id="btnNewChat" aria-label="New chat">
+                    <button
+                        class="icon-btn"
+                        id="btnNewChat"
+                        aria-label="New chat"
+                    >
                         <span class="material-symbols-outlined">
                             chat_add_on
                         </span>
@@ -27,9 +39,7 @@
 
                 <div class="search-wrap">
                     <div class="search">
-                        <span class="material-symbols-outlined">
-                            search
-                        </span>
+                        <span class="material-symbols-outlined"> search </span>
                         <input
                             type="search"
                             placeholder="Search or start a new chat"
@@ -175,14 +185,20 @@
                     aria-hidden="true"
                 >
                     <header class="side-head np-head">
-                        <button class="icon-btn" id="ncBack" aria-label="Back to chats">
+                        <button
+                            class="icon-btn"
+                            id="ncBack"
+                            aria-label="Back to chats"
+                        >
                             <span class="material-symbols-outlined">
                                 arrow_left_alt
                             </span>
                         </button>
                         <div class="np-title">
                             <div class="np-name" id="ncTitle">New chat</div>
-                            <div class="np-sub" id="ncSub">Pick someone to message</div>
+                            <div class="np-sub" id="ncSub">
+                                Pick someone to message
+                            </div>
                         </div>
                     </header>
 
@@ -213,7 +229,12 @@
                                     aria-label="Group name"
                                 />
                             </div>
-                            <button class="np-fab" id="ncCreate" aria-label="Create group" disabled>
+                            <button
+                                class="np-fab"
+                                id="ncCreate"
+                                aria-label="Create group"
+                                disabled
+                            >
                                 <span class="material-symbols-outlined">
                                     arrow_right_alt
                                 </span>
@@ -226,7 +247,12 @@
             <!-- ==================== CHAT ==================== -->
             <main class="chat">
                 <div class="chat-head">
-                    <span class="back-btn material-symbols-outlined" id="btnBack" role="button" tabindex="0">
+                    <span
+                        class="back-btn material-symbols-outlined"
+                        id="btnBack"
+                        role="button"
+                        tabindex="0"
+                    >
                         arrow_left_alt
                     </span>
                     <div class="avatar a1" id="chatAvatar">DA</div>
@@ -235,9 +261,7 @@
                         <div class="ch-sub">You, Pak Budi, Rina, Fajar, +6</div>
                     </div>
                     <button class="icon-btn" aria-label="Video call">
-                        <span class="material-symbols-outlined">
-                            call
-                        </span>
+                        <span class="material-symbols-outlined"> call </span>
                     </button>
                     <button class="icon-btn" aria-label="Menu">
                         <span class="material-symbols-outlined">
@@ -295,8 +319,10 @@
                             <div class="sender s2">Rina Prasetyo</div>
                             <div class="quote">
                                 <b>You</b>
-                                    <span>Statusnya otomatis pindah ke IN
-                                    TRANSIT…</span>
+                                <span
+                                    >Statusnya otomatis pindah ke IN
+                                    TRANSIT…</span
+                                >
                             </div>
                             <div class="text">
                                 Drivernya siapa? Perlu aku update di dashboard
@@ -369,14 +395,10 @@
                         class="icon-btn btn-mic"
                         aria-label="Record voice message"
                     >
-                        <span class="material-symbols-outlined">
-                            mic
-                        </span>
+                        <span class="material-symbols-outlined"> mic </span>
                     </button>
                     <button class="icon-btn btn-send" aria-label="Send message">
-                        <span class="material-symbols-outlined">
-                            send
-                        </span>
+                        <span class="material-symbols-outlined"> send </span>
                     </button>
                 </div>
             </main>
