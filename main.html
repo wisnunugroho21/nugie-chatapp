@@ -1,12 +1,9 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
     <head>
         <title>Chatbot Coba</title>
-        <link
-            rel="stylesheet"
-            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
-        />
-        <link rel="stylesheet" href="main.css" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"/>
+        <link rel="stylesheet" href="main.css"/>
     </head>
     <body>
         <div class="app">
@@ -25,22 +22,12 @@
                             phone_callback
                         </span>
                     </button>
-                    <button
-                        class="icon-btn"
-                        id="btnNewChat"
-                        aria-label="New chat"
-                    >
+                    <button class="icon-btn" id="btnNewChat" aria-label="New chat">
                         <span class="material-symbols-outlined">
                             chat_add_on
                         </span>
                     </button>
-                    <button
-                        class="icon-btn"
-                        id="btnListMenu"
-                        aria-label="Chat list options"
-                        aria-haspopup="menu"
-                        aria-expanded="false"
-                    >
+                    <button class="icon-btn" id="btnListMenu" aria-label="Chat list options" aria-haspopup="menu" aria-expanded="false">
                         <span class="material-symbols-outlined">
                             more_vert
                         </span>
@@ -49,7 +36,9 @@
 
                 <div class="search-wrap">
                     <div class="search">
-                        <span class="material-symbols-outlined"> search </span>
+                        <span class="material-symbols-outlined">
+                            search
+                        </span>
                         <input
                             id="chatSearch"
                             type="search"
@@ -73,135 +62,8 @@
                     <button class="chip" aria-pressed="false">Unread</button>
                 </div>
 
-                <div class="chat-list" role="list">
-                    <div
-                        class="chat-item is-active is-unread"
-                        role="listitem"
-                        tabindex="0"
-                        data-name="Dispatch Armada"
-                        data-sub="You, Pak Budi, Rina, Fajar, +6"
-                    >
-                        <div class="avatar a1">DA</div>
-                        <div class="ci-body">
-                            <div class="ci-name">Dispatch Armada</div>
-                            <div class="ci-time" style="color: var(--accent)">
-                                14:12
-                            </div>
-                            <div class="ci-msg">
-                                <span>Pak Budi: ETA Cikampek 14.30</span>
-                            </div>
-                            <div class="ci-meta">
-                                <span class="badge">3</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div
-                        class="chat-item"
-                        role="listitem"
-                        tabindex="0"
-                        data-name="Rina Prasetyo"
-                        data-sub="online"
-                    >
-                        <div class="avatar a3">RP</div>
-                        <div class="ci-body">
-                            <div class="ci-name">Rina Prasetyo</div>
-                            <div class="ci-time">13:48</div>
-                            <div class="ci-msg">
-                                <span
-                                    >Laporan stamina driver sudah aku
-                                    kirim</span
-                                >
-                            </div>
-                            <div class="ci-meta"></div>
-                        </div>
-                    </div>
-
-                    <div
-                        class="chat-item"
-                        role="listitem"
-                        tabindex="0"
-                        data-name="Andre — QA"
-                        data-sub="last seen today at 12:24"
-                    >
-                        <div class="avatar a5">AQ</div>
-                        <div class="ci-body">
-                            <div class="ci-name">Andre — QA</div>
-                            <div class="ci-time">12:20</div>
-                            <div class="ci-msg">
-                                <span class="material-symbols-outlined">
-                                    done_all
-                                </span>
-                                <span>Deploy staging jam 5 ya</span>
-                            </div>
-                            <div class="ci-meta"></div>
-                        </div>
-                    </div>
-
-                    <div
-                        class="chat-item is-unread"
-                        role="listitem"
-                        tabindex="0"
-                        data-name="Ibu"
-                        data-sub="last seen today at 11:06"
-                    >
-                        <div class="avatar a4">IB</div>
-                        <div class="ci-body">
-                            <div class="ci-name">Ibu</div>
-                            <div class="ci-time" style="color: var(--accent)">
-                                11:05
-                            </div>
-                            <div class="ci-msg">
-                                <span>Sudah makan siang belum?</span>
-                            </div>
-                            <div class="ci-meta">
-                                <span class="badge">1</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div
-                        class="chat-item"
-                        role="listitem"
-                        tabindex="0"
-                        data-name="Warung Bu Sri"
-                        data-sub="last seen today at 09:31"
-                    >
-                        <div class="avatar a6">WS</div>
-                        <div class="ci-body">
-                            <div class="ci-name">Warung Bu Sri</div>
-                            <div class="ci-time">09:30</div>
-                            <div class="ci-msg">
-                                <span class="material-symbols-outlined">
-                                    call
-                                </span>
-                                <span>0:12</span>
-                            </div>
-                            <div class="ci-meta"></div>
-                        </div>
-                    </div>
-
-                    <div
-                        class="chat-item"
-                        role="listitem"
-                        tabindex="0"
-                        data-name="Info Kost Melati"
-                        data-sub="You, Pak Herman, Dewi, +12"
-                    >
-                        <div class="avatar a4">KI</div>
-                        <div class="ci-body">
-                            <div class="ci-name">Info Kost Melati</div>
-                            <div class="ci-time">Friday</div>
-                            <div class="ci-msg">
-                                <span class="material-symbols-outlined">
-                                    photo
-                                </span>
-                                <span>Photo</span>
-                            </div>
-                            <div class="ci-meta"></div>
-                        </div>
-                    </div>
-                </div>
+                <!-- Rows are rendered from the CHATS array in JS -->
+                <div class="chat-list" role="list"></div>
 
                 <!-- ============ NEW CHAT PANEL ============ -->
                 <section
@@ -212,20 +74,14 @@
                     style="transform: translateX(-102%); visibility: hidden"
                 >
                     <header class="side-head np-head">
-                        <button
-                            class="icon-btn"
-                            id="ncBack"
-                            aria-label="Back to chats"
-                        >
+                        <button class="icon-btn" id="ncBack" aria-label="Back to chats">
                             <span class="material-symbols-outlined">
                                 arrow_left_alt
                             </span>
                         </button>
                         <div class="np-title">
                             <div class="np-name" id="ncTitle">New chat</div>
-                            <div class="np-sub" id="ncSub">
-                                Pick someone to message
-                            </div>
+                            <div class="np-sub" id="ncSub">Pick someone to message</div>
                         </div>
                     </header>
 
@@ -256,12 +112,7 @@
                                     aria-label="Group name"
                                 />
                             </div>
-                            <button
-                                class="np-fab"
-                                id="ncCreate"
-                                aria-label="Create group"
-                                disabled
-                            >
+                            <button class="np-fab" id="ncCreate" aria-label="Create group" disabled>
                                 <span class="material-symbols-outlined">
                                     arrow_right_alt
                                 </span>
@@ -274,12 +125,7 @@
             <!-- ==================== CHAT ==================== -->
             <main class="chat">
                 <div class="chat-head">
-                    <span
-                        class="back-btn material-symbols-outlined"
-                        id="btnBack"
-                        role="button"
-                        tabindex="0"
-                    >
+                    <span class="back-btn material-symbols-outlined" id="btnBack" role="button" tabindex="0">
                         arrow_left_alt
                     </span>
                     <div class="avatar a1" id="chatAvatar">DA</div>
@@ -287,141 +133,25 @@
                         <div class="ch-name">Dispatch Armada</div>
                         <div class="ch-sub">You, Pak Budi, Rina, Fajar, +6</div>
                     </div>
-                    <button
-                        class="icon-btn"
-                        id="btnVoiceCall"
-                        aria-label="Voice call"
-                    >
-                        <span class="material-symbols-outlined"> call </span>
+                    <button class="icon-btn" id="btnVoiceCall" aria-label="Voice call">
+                        <span class="material-symbols-outlined">
+                            call
+                        </span>
                     </button>
-                    <button
-                        class="icon-btn"
-                        id="btnVideoCall"
-                        aria-label="Video call"
-                    >
+                    <button class="icon-btn" id="btnVideoCall" aria-label="Video call">
                         <span class="material-symbols-outlined">
                             videocam
                         </span>
                     </button>
-                    <button
-                        class="icon-btn"
-                        id="btnChatMenu"
-                        aria-label="Chat options"
-                        aria-haspopup="menu"
-                        aria-expanded="false"
-                    >
+                    <button class="icon-btn" id="btnChatMenu" aria-label="Chat options" aria-haspopup="menu" aria-expanded="false">
                         <span class="material-symbols-outlined">
                             more_vert
                         </span>
                     </button>
                 </div>
 
-                <div id="chat_thread" class="thread">
-                    <div class="pill">Today</div>
-                    <div class="pill notice">
-                        Messages are end-to-end encrypted. No one outside this
-                        chat can read them.
-                    </div>
-
-                    <div class="row in first">
-                        <div class="bubble">
-                            <div class="sender s1">Pak Budi</div>
-                            <div class="text">
-                                Unit B 9021 FF selesai loading di gudang
-                                Marunda. Segel sudah dipasang.
-                                <span class="meta">14:02</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row in">
-                        <div class="bubble">
-                            <div class="text">
-                                Surat jalan sudah discan, tolong dicek di sistem
-                                ya.
-                                <span class="meta">14:03</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row out first">
-                        <div class="bubble">
-                            <div class="text">
-                                Sudah masuk, Pak. Statusnya otomatis pindah ke
-                                <b>IN TRANSIT</b> begitu surat jalan
-                                tervalidasi.
-                                <span class="meta">
-                                    14:05
-                                    <span class="material-symbols-outlined">
-                                        done_all
-                                    </span>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row in first">
-                        <div class="bubble">
-                            <div class="sender s2">Rina Prasetyo</div>
-                            <div class="quote">
-                                <b>You</b>
-                                <span
-                                    >Statusnya otomatis pindah ke IN
-                                    TRANSIT…</span
-                                >
-                            </div>
-                            <div class="text">
-                                Drivernya siapa? Perlu aku update di dashboard
-                                stamina.
-                                <span class="meta">14:08</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row out first">
-                        <div class="bubble">
-                            <div class="text">
-                                Pak Slamet. Istirahat terakhir 11:40, jadi jam
-                                kerjanya masih aman sampai sore.
-                                <span class="meta"
-                                    >14:09
-                                    <span class="material-symbols-outlined">
-                                        done_all
-                                    </span>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row in first">
-                        <div class="bubble">
-                            <div class="sender s3">Fajar</div>
-                            <div class="text">
-                                Noted. Aku pantau dari panel dispatch.
-                                <span class="meta">14:11</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row in first">
-                        <div class="bubble">
-                            <div class="sender s1">Pak Budi</div>
-                            <div class="text">
-                                Siap. ETA Cikampek 14:30, nanti saya kabari lagi
-                                kalau sudah lewat tol.
-                                <span class="meta">14:12</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row in first">
-                        <div class="bubble">
-                            <div class="typing" aria-label="Rina is typing">
-                                <i></i><i></i><i></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <!-- Bubbles are rendered from the MESSAGES data in JS -->
+                <div id="chat_thread" class="thread"></div>
 
                 <div class="composer">
                     <button class="icon-btn" aria-label="Attach file">
@@ -441,10 +171,14 @@
                         class="icon-btn btn-mic"
                         aria-label="Record voice message"
                     >
-                        <span class="material-symbols-outlined"> mic </span>
+                        <span class="material-symbols-outlined">
+                            mic
+                        </span>
                     </button>
                     <button class="icon-btn btn-send" aria-label="Send message">
-                        <span class="material-symbols-outlined"> send </span>
+                        <span class="material-symbols-outlined">
+                            send
+                        </span>
                     </button>
                 </div>
             </main>
@@ -497,9 +231,7 @@
                         aria-pressed="false"
                         aria-label="Turn camera on"
                     >
-                        <span class="material-symbols-outlined"
-                            >videocam_off</span
-                        >
+                        <span class="material-symbols-outlined">videocam_off</span>
                     </button>
                     <button
                         class="call-btn"
@@ -509,11 +241,7 @@
                     >
                         <span class="material-symbols-outlined">volume_up</span>
                     </button>
-                    <button
-                        class="call-btn end"
-                        id="callEnd"
-                        aria-label="End call"
-                    >
+                    <button class="call-btn end" id="callEnd" aria-label="End call">
                         <span class="material-symbols-outlined">call_end</span>
                     </button>
                 </div>
@@ -534,18 +262,10 @@
                 <div class="ct-sub" id="ctSub">Incoming voice call</div>
             </div>
             <div class="ct-actions">
-                <button
-                    class="ct-btn decline"
-                    id="ctDecline"
-                    aria-label="Decline call"
-                >
+                <button class="ct-btn decline" id="ctDecline" aria-label="Decline call">
                     <span class="material-symbols-outlined">call_end</span>
                 </button>
-                <button
-                    class="ct-btn accept"
-                    id="ctAccept"
-                    aria-label="Accept call"
-                >
+                <button class="ct-btn accept" id="ctAccept" aria-label="Accept call">
                     <span class="material-symbols-outlined">call</span>
                 </button>
             </div>
