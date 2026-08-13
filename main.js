@@ -1,5 +1,12 @@
+import * as fb from "./firebase-chat.js";
+
 (function () {
   "use strict";
+
+  /* Flipped on once Firebase is connected. Until then — and forever, if
+     firebase-config.js is still holding placeholders — every path below
+     falls back to the in-memory seed data. */
+  let remote = false;
 
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
@@ -455,6 +462,38 @@
   }
 
   /* ---------- Chat switching ---------- */
+  function paintHeader(chat) {
+    headName.textContent = chat.name;
+    headSub.textContent = chat.sub || "online";
+    headAvatar.className = "avatar " + chat.av;
+    headAvatar.textContent = faceInitials(chat);
+  }
+
+  /* Only the open conversation carries a message listener; switching
+     chats drops the previous one. */
+  let unwatchThread = null;
+
+  function watchCurrent() {
+    if (unwatchThread) {
+      unwatchThread();
+      unwatchThread = null;
+    }
+    if (!remote) return;
+
+    const name = current;
+    const chat = chatByName(name);
+    const id = (chat && chat.id) || fb.chatIdFor(name);
+    fb.setOpenChat(id);
+
+    unwatchThread = fb.watchMessages(id, (entries) => {
+      threads.set(name, entries);
+      dropHits(); // thread contents changed under the search index
+      // Looking at a conversation is what marks it read.
+      fb.markRead(id, entries.filter((e) => e.kind !== "day").length);
+      if (name === current) renderThread(name);
+    });
+  }
+
   function openChat(name) {
     const chat = chatByName(name);
     if (!chat) return;
@@ -462,11 +501,8 @@
     chat.unread = 0;
     current = name;
 
-    headName.textContent = chat.name;
-    headSub.textContent = chat.sub || "online";
-    headAvatar.className = "avatar " + chat.av;
-    headAvatar.textContent = faceInitials(chat);
-
+    paintHeader(chat);
+    watchCurrent();
     renderThread(name);
     renderChats();
     showPane("chat");
@@ -822,9 +858,22 @@
   });
 
   function startChat(c) {
-    ensureChat({ name: c.name, av: c.av, sub: c.about, preview: "Draft" });
+    const chat = ensureChat({
+      name: c.name,
+      av: c.av,
+      sub: c.about,
+      preview: "Draft",
+    });
+    publishChat(chat);
     closePanel();
     openChat(c.name);
+  }
+
+  /* A conversation the user just created has to exist server-side too,
+     or the first snapshot drops it off the list again. */
+  function publishChat(chat) {
+    if (!remote || !chat) return;
+    fb.upsertChat(chat).catch((err) => console.error("[firebase] chat", err));
   }
 
   /* ---------- Group mode ---------- */
@@ -885,13 +934,14 @@
         .map((m) => m.name.split(" ")[0])
         .slice(0, 3)
         .join(", ");
-    ensureChat({
+    const chat = ensureChat({
       name,
       av: "a2",
       group: true,
       sub: "You, " + members.map((m) => m.name.split(" ")[0]).join(", "),
       preview: "You created this group",
     });
+    publishChat(chat);
     closePanel();
     openChat(name);
   });
@@ -905,15 +955,27 @@
     const text = msgInput.value.trim();
     if (!text) return;
 
+    msgInput.value = "";
+    msgInput.focus({ preventScroll: true });
+
+    // Firestore echoes the write back through the open listener before
+    // it reaches the network, so the bubble appears immediately and
+    // there is nothing local to reconcile.
+    if (remote) {
+      const chat = chatByName(current);
+      fb.sendMessage(chat || { name: current }, text).catch((err) => {
+        console.error("[firebase] send", err);
+        say("Pesan gagal terkirim");
+      });
+      return;
+    }
+
     threadOf(current).push({ out: true, text, time: now() });
     renderThread(current);
 
     setPreview(current, text, "done_all");
     dropHits(); // thread changed
     renderChats();
-
-    msgInput.value = "";
-    msgInput.focus({ preventScroll: true });
   }
 
   sendBtn.addEventListener("click", send);
@@ -1347,11 +1409,22 @@
         ? "videocam"
         : "call";
 
+    const chat = ensureChat({ name, av: faceOf(name).av });
+
+    // Calls are still simulated, but the log line is a real message so
+    // that the next snapshot doesn't erase it from the thread.
+    if (remote) {
+      fb.logCall(chat, { text, icon, missed, preview }).catch((err) =>
+        console.error("[firebase] call log", err),
+      );
+      if (name !== current) announce(`${name}: ${text}`);
+      return;
+    }
+
     // Works whether or not that chat is on screen.
     threadOf(name).push({ kind: "call", text, icon, missed, time: now() });
     if (name === current) renderThread(name);
 
-    ensureChat({ name, av: faceOf(name).av });
     setPreview(name, preview || text, icon);
     if (missed) bumpUnread(name);
     if (name !== current) announce(`${name}: ${text}`);
@@ -1445,6 +1518,55 @@
     }
   });
 
+  /* ============================================================
+    FIREBASE
+    The conversation list becomes a projection of the chats
+    collection, and the open thread a projection of its messages
+    subcollection. Everything above keeps rendering the same shapes it
+    always did.
+    ============================================================ */
+  function onChats(list) {
+    // Replace in place: `chats` is closed over all over this file.
+    chats.length = 0;
+    list.forEach((c) => chats.push(c));
+
+    if (chats.length) {
+      let chat = chatByName(current);
+      if (!chat) {
+        // Whatever we were looking at is not in the collection —
+        // fall back to the newest conversation.
+        chat = chats[0];
+        current = chat.name;
+        watchCurrent();
+      }
+      chat.unread = 0;
+      paintHeader(chat);
+    }
+
+    dropHits();
+    renderChats();
+  }
+
+  async function boot() {
+    if (!fb.configured) {
+      say("Mode lokal — isi firebase-config.js untuk sinkronisasi");
+      return;
+    }
+    try {
+      await fb.connect();
+      await fb.seedIfEmpty(CHATS, MESSAGES);
+      remote = true;
+      watchCurrent(); // registers the open chat before the list arrives
+      fb.watchChats(onChats);
+      say(`Terhubung sebagai ${fb.whoami().name}`);
+    } catch (err) {
+      console.error("[firebase] connect", err);
+      remote = false;
+      say("Firebase tidak tersambung — memakai data lokal");
+    }
+  }
+
   renderChats();
   renderThread(current);
+  boot();
 })();

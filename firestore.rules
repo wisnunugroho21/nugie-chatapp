@@ -1,0 +1,32 @@
+rules_version = '2';
+
+/* Demo-grade rules: any signed-in client (including anonymous) may read
+   and write every conversation, because this clone has no membership
+   model — there is no field saying who belongs in a chat.
+
+   Before putting this anywhere public, add a `members` array to each
+   chat document and gate on `request.auth.uid in resource.data.members`. */
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /chats/{chatId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null
+                   && request.resource.data.name is string;
+
+      match /messages/{messageId} {
+        allow read: if request.auth != null;
+
+        // A message may only be created, never edited, and only in
+        // your own name — except for the one-time `seed:*` import that
+        // fills an empty project with the demo conversations. Drop that
+        // clause once you have seeded.
+        allow create: if request.auth != null
+                      && (request.resource.data.senderId == request.auth.uid
+                          || request.resource.data.senderId.matches('^seed:.*'))
+                      && request.resource.data.text is string
+                      && request.resource.data.text.size() <= 4000;
+        allow update, delete: if false;
+      }
+    }
+  }
+}
