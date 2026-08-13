@@ -1,4 +1,5 @@
 import * as fb from "./firebase-chat.js";
+import * as push from "./firebase-push.js";
 
 (function () {
   "use strict";
@@ -1137,6 +1138,7 @@ import * as fb from "./firebase-chat.js";
             say("Daftar chat dimuat ulang");
           }),
       },
+      ...notifyItem(),
     ]);
   });
 
@@ -1547,6 +1549,101 @@ import * as fb from "./firebase-chat.js";
     renderChats();
   }
 
+  /* ============================================================
+    CLOUD MESSAGING
+    The token half only. Sending is a Cloud Function — see
+    functions/index.js — because FCM will not deliver on a credential
+    a browser is allowed to hold.
+    ============================================================ */
+  let pushReady = false; // supported, configured, secure context
+
+  /* Extra entry on the chat-list menu. A permission prompt needs a user
+     gesture, and the menu is the only one the sidebar has. */
+  function notifyItem() {
+    if (!pushReady) return [];
+
+    const state = push.permission();
+
+    if (state === "granted")
+      return [
+        {
+          icon: "notifications_active",
+          label: "Notifikasi aktif",
+          run: () => say("Notifikasi sudah aktif untuk perangkat ini"),
+        },
+      ];
+
+    if (state === "denied")
+      return [
+        {
+          icon: "notifications_off",
+          label: "Notifikasi diblokir",
+          run: () => say("Izinkan notifikasi lewat setelan situs di browser"),
+        },
+      ];
+
+    return [
+      {
+        icon: "notifications",
+        label: "Aktifkan notifikasi",
+        // No busy() spinner here: the prompt needs the click's user
+        // activation, and that does not survive a timeout.
+        run: askPush,
+      },
+    ];
+  }
+
+  async function askPush() {
+    try {
+      const res = await push.enable();
+      say(
+        res.ok
+          ? "Notifikasi aktif untuk perangkat ini"
+          : res.reason === "denied"
+            ? "Notifikasi ditolak"
+            : "Notifikasi tidak tersedia di browser ini",
+      );
+      if (res.ok) listenPush();
+    } catch (err) {
+      console.error("[fcm] enable", err);
+      say("Gagal mengaktifkan notifikasi");
+    }
+  }
+
+  /* A push that lands while the tab is focused shows no OS notification,
+     so surface it here — unless the user is already reading that very
+     conversation, where the message is on screen anyway. */
+  let pushBound = false;
+
+  function listenPush() {
+    if (pushBound) return;
+    pushBound = true;
+
+    push.onPush((data) => {
+      if (data.chat && data.chat === current) return;
+      say(`${data.title || "Pesan baru"}: ${data.body || ""}`);
+      announce(`${data.title || "Pesan baru"}: ${data.body || ""}`);
+    });
+  }
+
+  async function bootPush() {
+    pushReady = await push.available();
+    if (!pushReady) return;
+
+    // Already granted on a previous visit: refresh the token quietly.
+    // Tokens rotate, and a stale one is a silent delivery failure.
+    if (push.permission() !== "granted") return;
+    const res = await push.enable({ ask: false });
+    if (res.ok) listenPush();
+  }
+
+  /* Opened from a notification click. */
+  function openFromLink(name) {
+    if (!name) return;
+    const chat = chatByName(name);
+    if (chat) openChat(chat.name);
+  }
+
   async function boot() {
     if (!fb.configured) {
       say("Mode lokal — isi firebase-config.js untuk sinkronisasi");
@@ -1563,7 +1660,15 @@ import * as fb from "./firebase-chat.js";
       console.error("[firebase] connect", err);
       remote = false;
       say("Firebase tidak tersambung — memakai data lokal");
+      return;
     }
+
+    push.onNotificationClick(openFromLink);
+    bootPush().catch((err) => console.error("[fcm] boot", err));
+
+    // A cold start from a notification arrives as ?chat=…
+    const wanted = new URLSearchParams(location.search).get("chat");
+    if (wanted) setTimeout(() => openFromLink(wanted), 0);
   }
 
   renderChats();

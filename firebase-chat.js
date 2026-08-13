@@ -287,6 +287,18 @@ export function logCall(chat, { text, icon, missed, preview }) {
   );
 }
 
+/* ---------- Push targets ----------
+   One document per browser, keyed by its FCM token. The Cloud Function
+   reads this collection to decide where a new message should ring;
+   nothing in the client ever reads it back. */
+export function registerDevice(token) {
+  return setDoc(
+    doc(db, "devices", token),
+    { uid: me.uid, name: me.name, updatedAt: Timestamp.now() },
+    { merge: true },
+  );
+}
+
 /** Create or refresh a conversation document without posting to it. */
 export function upsertChat(chat) {
   return setDoc(

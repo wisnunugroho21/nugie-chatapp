@@ -18,6 +18,14 @@ export const firebaseConfig = {
   appId: "YOUR_APP_ID",
 };
 
+/* Web Push certificate for Cloud Messaging:
+   Project settings → Cloud Messaging → Web configuration → Web Push
+   certificates → Generate key pair. Paste the public key here.
+
+   Leave the placeholder and the app simply never asks for notification
+   permission — everything else still works. */
+export const VAPID_KEY = "YOUR_VAPID_PUBLIC_KEY";
+
 /* How you appear to the other side. Anonymous auth gives every browser
    its own uid, so open the app in two browsers with two different names
    here to watch messages travel. */
