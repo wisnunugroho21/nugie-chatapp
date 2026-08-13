@@ -3,112 +3,385 @@
     <head>
         <title>Chatbot Coba</title>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"/>
-        <link rel="stylesheet" href="main.css">
+        <link rel="stylesheet" href="style.css" />
     </head>
     <body>
-        <div id="app" class="app">
+        <input type="checkbox" id="pane-toggle" tabindex="-1" aria-hidden="true" />
+        <div class="app">
+            <!-- ==================== SIDEBAR ==================== -->
+            <aside class="sidebar">
+                <header class="side-head">
+                    <div class="avatar a1" aria-label="Your profile">NU</div>
+                    <div class="spacer"></div>
+                    <button class="icon-btn" id="btnNewChat" aria-label="New chat">
+                        <span class="material-symbols-outlined">
+                            chat_add_on
+                        </span>
+                    </button>
+                    <button class="icon-btn" aria-label="Menu">
+                        <span class="material-symbols-outlined">
+                            more_vert
+                        </span>
+                    </button>
+                </header>
 
-            <!-- LEFT SECTION -->
-
-            <section id="main-left" class="main-left">
-                <!-- header -->
-                <div id="header-left" class="header-left">
-                    <div class="header-left-title">TMS</div>
-
-                </div>
-
-                <!-- chat list -->
-                <div id="chat-list" class="chat-list">
-                    <div class="search-area">
-                        <!-- attachment btn -->
-                        <div class="search-btn">
-                            <span class="material-symbols-outlined">search</span>
-                        </div>
-
-                        <!-- input form -->
-                        <input id="type-search-area" class="type-search-area" placeholder="Type something...">
-                    </div>
-
-                    <!-- user lists -->
-                    <div id="friends" class="friends">
-                        <!-- photo -->
-                        <div class="profile friends-photo">
-                            <img src="images/ava2.jpg" alt="">
-                        </div>
-
-                        <div class="friends-credent">
-                            <!-- name -->
-                            <span class="friends-name">Mario Gomez</span>
-                            <!-- last message -->
-                            <span class="friends-message">Crap! I forgot my shoes. Can you bring extra pair for me? Crap! I forgot my shoes. Can you bring extra pair for me?</span>
-                        </div>
-                        <!-- notification badge -->
-                        <span class="badge notif-badge">7</span>
-                    </div>
-                </div>
-            </section>
-
-            <!-- RIGHT SECTION -->
-
-            <section id="main-right" class="main-right">
-                <!-- header -->
-                <div id="header-right" class="header-right">
-                    <!-- profile pict -->
-                    <div id="header-img" class="profile header-img">
-                        <img src="images/ava2.jpg" alt="">
-                    </div>
-
-                    <!-- name -->
-                    <div class="friend-desc">
-                        <h4 class="name friend-name">Mario Gomez</h4>
-                        <p class="friend-status">Yo Dybala!</p>
-                    </div>
-
-                    <!-- some btn -->
-                    <div class="some-btn">
-                        <span class="material-symbols-outlined">headphones</span>
+                <div class="search-wrap">
+                    <div class="search">
+                        <span class="material-symbols-outlined">
+                            search
+                        </span>
+                        <input
+                            type="search"
+                            placeholder="Search or start a new chat"
+                            aria-label="Search chats"
+                        />
                     </div>
                 </div>
 
-                <!-- chat area -->
-                <div id="chat-area" class="chat-area">
-                    <!-- chat content -->
+                <div class="filters" role="group" aria-label="Filter chats">
+                    <button class="chip" aria-pressed="true">All</button>
+                    <button class="chip" aria-pressed="false">Unread</button>
+                </div>
 
-                    <!-- FRIENDS CHAT TEMPLATE -->
-                    <div id="friends-chat" class="friends-chat">
-                        <div class="profile friends-chat-photo">
-                            <img src="images/ava2.jpg" alt="">
+                <div class="chat-list" role="list">
+                    <label
+                        class="chat-item is-active is-unread"
+                        role="listitem"
+                        data-name="Dispatch Armada"
+                        data-sub="You, Pak Budi, Rina, Fajar, +6"
+                    >
+                        <div class="avatar a1">DA</div>
+                        <div class="ci-body">
+                            <div class="ci-name">Dispatch Armada</div>
+                            <div class="ci-time" style="color: var(--accent)">
+                                14:12
+                            </div>
+                            <div class="ci-msg">
+                                <span>Pak Budi: ETA Cikampek 14.30</span>
+                            </div>
+                            <div class="ci-meta">
+                                <span class="badge">3</span>
+                            </div>
                         </div>
-                        <div class="friends-chat-content">
-                            <p class="friends-chat-name">Mario Gomez</p>
-                            <p class="friends-chat-balloon">Yo Dybala!</p>
-                            <h5 class="chat-datetime">Sun, Aug 30 | 15:41</h5>
+                    </label>
+
+                    <label
+                        class="chat-item"
+                        role="listitem"
+                        data-name="Rina Prasetyo"
+                        data-sub="online"
+                    >
+                        <div class="avatar a3">RP</div>
+                        <div class="ci-body">
+                            <div class="ci-name">Rina Prasetyo</div>
+                            <div class="ci-time">13:48</div>
+                            <div class="ci-msg">
+                                <span
+                                    >Laporan stamina driver sudah aku
+                                    kirim</span
+                                >
+                            </div>
+                            <div class="ci-meta"></div>
+                        </div>
+                    </label>
+
+                    <label
+                        class="chat-item"
+                        role="listitem"
+                        data-name="Andre — QA"
+                        data-sub="last seen today at 12:24"
+                    >
+                        <div class="avatar a5">AQ</div>
+                        <div class="ci-body">
+                            <div class="ci-name">Andre — QA</div>
+                            <div class="ci-time">12:20</div>
+                            <div class="ci-msg">
+                                <span class="material-symbols-outlined">
+                                    done_all
+                                </span>
+                                <span>Deploy staging jam 5 ya</span>
+                            </div>
+                            <div class="ci-meta"></div>
+                        </div>
+                    </label>
+
+                    <label
+                        class="chat-item is-unread"
+                        role="listitem"
+                        data-name="Ibu"
+                        data-sub="last seen today at 11:06"
+                    >
+                        <div class="avatar a4">IB</div>
+                        <div class="ci-body">
+                            <div class="ci-name">Ibu</div>
+                            <div class="ci-time" style="color: var(--accent)">
+                                11:05
+                            </div>
+                            <div class="ci-msg">
+                                <span>Sudah makan siang belum?</span>
+                            </div>
+                            <div class="ci-meta">
+                                <span class="badge">1</span>
+                            </div>
+                        </div>
+                    </label>
+
+                    <label
+                        class="chat-item"
+                        role="listitem"
+                        data-name="Warung Bu Sri"
+                        data-sub="last seen today at 09:31"
+                    >
+                        <div class="avatar a6">WS</div>
+                        <div class="ci-body">
+                            <div class="ci-name">Warung Bu Sri</div>
+                            <div class="ci-time">09:30</div>
+                            <div class="ci-msg">
+                                <span class="material-symbols-outlined">
+                                    call
+                                </span>
+                                <span>0:12</span>
+                            </div>
+                            <div class="ci-meta"></div>
+                        </div>
+                    </label>
+
+                    <label
+                        class="chat-item"
+                        role="listitem"
+                        data-name="Info Kost Melati"
+                        data-sub="You, Pak Herman, Dewi, +12"
+                    >
+                        <div class="avatar a4">KI</div>
+                        <div class="ci-body">
+                            <div class="ci-name">Info Kost Melati</div>
+                            <div class="ci-time">Friday</div>
+                            <div class="ci-msg">
+                                <span class="material-symbols-outlined">
+                                    photo
+                                </span>
+                                <span>Photo</span>
+                            </div>
+                            <div class="ci-meta"></div>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- ============ NEW CHAT PANEL ============ -->
+                <section
+                    class="new-chat"
+                    id="newChat"
+                    aria-label="New chat"
+                    aria-hidden="true"
+                >
+                    <header class="side-head np-head">
+                        <button class="icon-btn" id="ncBack" aria-label="Back to chats">
+                            <span class="material-symbols-outlined">
+                                arrow_left_alt
+                            </span>
+                        </button>
+                        <div class="np-title">
+                            <div class="np-name" id="ncTitle">New chat</div>
+                            <div class="np-sub" id="ncSub">Pick someone to message</div>
+                        </div>
+                    </header>
+
+                    <div class="search-wrap">
+                        <div class="search">
+                            <span class="material-symbols-outlined">
+                                search
+                            </span>
+                            <input
+                                id="ncSearch"
+                                type="search"
+                                placeholder="Search name or number"
+                                aria-label="Search contacts"
+                            />
                         </div>
                     </div>
 
-                    <!-- YOUR CHAT TEMPLATE -->
-                    <div id="your-chat" class="your-chat">
-                        <p class="your-chat-balloon">'sup</p>
-                        <p class="chat-datetime"><span class="glyphicon glyphicon-ok"></span> Sun, Aug 30 | 15:45</p>
+                    <div class="np-list" id="ncList"></div>
+
+                    <footer class="np-foot">
+                        <div class="np-chips" id="ncChips"></div>
+                        <div class="np-make">
+                            <div class="field">
+                                <input
+                                    id="ncGroupName"
+                                    type="text"
+                                    placeholder="Group name"
+                                    aria-label="Group name"
+                                />
+                            </div>
+                            <button class="np-fab" id="ncCreate" aria-label="Create group" disabled>
+                                <span class="material-symbols-outlined">
+                                    arrow_right_alt
+                                </span>
+                            </button>
+                        </div>
+                    </footer>
+                </section>
+            </aside>
+
+            <!-- ==================== CHAT ==================== -->
+            <main class="chat">
+                <div class="chat-head">
+                    <span class="back-btn material-symbols-outlined" id="btnBack" role="button" tabindex="0">
+                        arrow_left_alt
+                    </span>
+                    <div class="avatar a1" id="chatAvatar">DA</div>
+                    <div class="ch-info">
+                        <div class="ch-name">Dispatch Armada</div>
+                        <div class="ch-sub">You, Pak Budi, Rina, Fajar, +6</div>
+                    </div>
+                    <button class="icon-btn" aria-label="Video call">
+                        <span class="material-symbols-outlined">
+                            call
+                        </span>
+                    </button>
+                    <button class="icon-btn" aria-label="Menu">
+                        <span class="material-symbols-outlined">
+                            more_vert
+                        </span>
+                    </button>
+                </div>
+
+                <div id="chat_thread" class="thread">
+                    <div class="pill">Today</div>
+                    <div class="pill notice">
+                        Messages are end-to-end encrypted. No one outside this
+                        chat can read them.
+                    </div>
+
+                    <div class="row in first">
+                        <div class="bubble">
+                            <div class="sender s1">Pak Budi</div>
+                            <div class="text">
+                                Unit B 9021 FF selesai loading di gudang
+                                Marunda. Segel sudah dipasang.
+                                <span class="meta">14:02</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row in">
+                        <div class="bubble">
+                            <div class="text">
+                                Surat jalan sudah discan, tolong dicek di sistem
+                                ya.
+                                <span class="meta">14:03</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row out first">
+                        <div class="bubble">
+                            <div class="text">
+                                Sudah masuk, Pak. Statusnya otomatis pindah ke
+                                <b>IN TRANSIT</b> begitu surat jalan
+                                tervalidasi.
+                                <span class="meta">
+                                    14:05
+                                    <span class="material-symbols-outlined">
+                                        done_all
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row in first">
+                        <div class="bubble">
+                            <div class="sender s2">Rina Prasetyo</div>
+                            <div class="quote">
+                                <b>You</b>
+                                    <span>Statusnya otomatis pindah ke IN
+                                    TRANSIT…</span>
+                            </div>
+                            <div class="text">
+                                Drivernya siapa? Perlu aku update di dashboard
+                                stamina.
+                                <span class="meta">14:08</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row out first">
+                        <div class="bubble">
+                            <div class="text">
+                                Pak Slamet. Istirahat terakhir 11:40, jadi jam
+                                kerjanya masih aman sampai sore.
+                                <span class="meta"
+                                    >14:09
+                                    <span class="material-symbols-outlined">
+                                        done_all
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row in first">
+                        <div class="bubble">
+                            <div class="sender s3">Fajar</div>
+                            <div class="text">
+                                Noted. Aku pantau dari panel dispatch.
+                                <span class="meta">14:11</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row in first">
+                        <div class="bubble">
+                            <div class="sender s1">Pak Budi</div>
+                            <div class="text">
+                                Siap. ETA Cikampek 14:30, nanti saya kabari lagi
+                                kalau sudah lewat tol.
+                                <span class="meta">14:12</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row in first">
+                        <div class="bubble">
+                            <div class="typing" aria-label="Rina is typing">
+                                <i></i><i></i><i></i>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- typing area -->
-                <div id="typing-area" class="typing-area">
-                    <div class="input-area">
-                        <!-- input form -->
-                        <input id="type-area" class="type-area" placeholder="Type something...">
-                        <!-- attachment btn -->
-                        <div class="attach-btn">
-                            <span class="material-symbols-outlined btn">attach_file</span>
-                        </div>
+                <div class="composer">
+                    <button class="icon-btn" aria-label="Attach file">
+                        <span class="material-symbols-outlined">
+                            attach_file
+                        </span>
+                    </button>
+                    <div class="field">
+                        <input
+                            class="msg-input"
+                            type="text"
+                            placeholder="Type a message"
+                            aria-label="Type a message"
+                        />
                     </div>
-                    <!-- send btn -->
-                    <div class="send-area">
-                        <span class="material-symbols-outlined send-btn btn">send</span>
-                    </div>
+                    <button
+                        class="icon-btn btn-mic"
+                        aria-label="Record voice message"
+                    >
+                        <span class="material-symbols-outlined">
+                            mic
+                        </span>
+                    </button>
+                    <button class="icon-btn btn-send" aria-label="Send message">
+                        <span class="material-symbols-outlined">
+                            send
+                        </span>
+                    </button>
                 </div>
-            </section>
+            </main>
         </div>
+
+        <script src="main.js"></script>
     </body>
 </html>
