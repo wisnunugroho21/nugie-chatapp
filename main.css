@@ -85,6 +85,15 @@ input {
 
 /* ============================================================
 APP SHELL
+============================================================ */
+.app {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: minmax(300px, var(--sidebar-w)) 1fr;
+    background: var(--panel);
+    overflow: hidden;
+}
 
 /* ============================================================
 SIDEBAR
