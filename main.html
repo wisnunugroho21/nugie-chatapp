@@ -17,6 +17,16 @@
                     <div class="spacer"></div>
                     <button
                         class="icon-btn"
+                        id="btnSimIncoming"
+                        aria-label="Simulate an incoming call"
+                        title="Simulate an incoming call"
+                    >
+                        <span class="material-symbols-outlined">
+                            phone_callback
+                        </span>
+                    </button>
+                    <button
+                        class="icon-btn"
                         id="btnNewChat"
                         aria-label="New chat"
                     >
@@ -24,7 +34,13 @@
                             chat_add_on
                         </span>
                     </button>
-                    <button class="icon-btn" aria-label="Menu">
+                    <button
+                        class="icon-btn"
+                        id="btnListMenu"
+                        aria-label="Chat list options"
+                        aria-haspopup="menu"
+                        aria-expanded="false"
+                    >
                         <span class="material-symbols-outlined">
                             more_vert
                         </span>
@@ -35,10 +51,20 @@
                     <div class="search">
                         <span class="material-symbols-outlined"> search </span>
                         <input
+                            id="chatSearch"
                             type="search"
                             placeholder="Search or start a new chat"
                             aria-label="Search chats"
                         />
+                        <button
+                            class="search-clear"
+                            id="chatSearchClear"
+                            type="button"
+                            aria-label="Clear search"
+                            style="display: none"
+                        >
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
                     </div>
                 </div>
 
@@ -261,10 +287,29 @@
                         <div class="ch-name">Dispatch Armada</div>
                         <div class="ch-sub">You, Pak Budi, Rina, Fajar, +6</div>
                     </div>
-                    <button class="icon-btn" aria-label="Video call">
+                    <button
+                        class="icon-btn"
+                        id="btnVoiceCall"
+                        aria-label="Voice call"
+                    >
                         <span class="material-symbols-outlined"> call </span>
                     </button>
-                    <button class="icon-btn" aria-label="Menu">
+                    <button
+                        class="icon-btn"
+                        id="btnVideoCall"
+                        aria-label="Video call"
+                    >
+                        <span class="material-symbols-outlined">
+                            videocam
+                        </span>
+                    </button>
+                    <button
+                        class="icon-btn"
+                        id="btnChatMenu"
+                        aria-label="Chat options"
+                        aria-haspopup="menu"
+                        aria-expanded="false"
+                    >
                         <span class="material-symbols-outlined">
                             more_vert
                         </span>
@@ -403,6 +448,107 @@
                     </button>
                 </div>
             </main>
+        </div>
+
+        <!-- ==================== SHARED MENU + SNACKBAR ==================== -->
+        <div class="menu" id="menu" role="menu" style="display: none"></div>
+        <div class="snack" id="snack" role="status" style="display: none"></div>
+
+        <!-- ==================== CALL SCREEN ==================== -->
+        <div
+            class="call-overlay"
+            id="callOverlay"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Call"
+            style="display: none"
+        >
+            <div class="call-card" id="callCard">
+                <div class="call-stage" id="callStage" style="display: none">
+                    <div class="avatar a1" id="callStageAvatar">DA</div>
+                    <div class="call-self">
+                        <span class="material-symbols-outlined">person</span>
+                        You
+                    </div>
+                </div>
+
+                <div class="avatar a1" id="callAvatar">DA</div>
+                <div class="call-name" id="callName">—</div>
+                <div class="call-status" id="callStatus">Calling…</div>
+                <div class="call-flags" id="callFlags"></div>
+
+                <div class="call-e2e">
+                    <span class="material-symbols-outlined">lock</span>
+                    End-to-end encrypted
+                </div>
+
+                <div class="call-controls">
+                    <button
+                        class="call-btn"
+                        id="callMute"
+                        aria-pressed="false"
+                        aria-label="Mute microphone"
+                    >
+                        <span class="material-symbols-outlined">mic</span>
+                    </button>
+                    <button
+                        class="call-btn"
+                        id="callCam"
+                        aria-pressed="false"
+                        aria-label="Turn camera on"
+                    >
+                        <span class="material-symbols-outlined"
+                            >videocam_off</span
+                        >
+                    </button>
+                    <button
+                        class="call-btn"
+                        id="callSpeaker"
+                        aria-pressed="false"
+                        aria-label="Speaker"
+                    >
+                        <span class="material-symbols-outlined">volume_up</span>
+                    </button>
+                    <button
+                        class="call-btn end"
+                        id="callEnd"
+                        aria-label="End call"
+                    >
+                        <span class="material-symbols-outlined">call_end</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== INCOMING CALL ==================== -->
+        <div
+            class="call-toast"
+            id="callToast"
+            role="alertdialog"
+            aria-label="Incoming call"
+            style="display: none"
+        >
+            <div class="avatar a3" id="ctAvatar">RP</div>
+            <div class="ct-body">
+                <div class="ct-name" id="ctName">—</div>
+                <div class="ct-sub" id="ctSub">Incoming voice call</div>
+            </div>
+            <div class="ct-actions">
+                <button
+                    class="ct-btn decline"
+                    id="ctDecline"
+                    aria-label="Decline call"
+                >
+                    <span class="material-symbols-outlined">call_end</span>
+                </button>
+                <button
+                    class="ct-btn accept"
+                    id="ctAccept"
+                    aria-label="Accept call"
+                >
+                    <span class="material-symbols-outlined">call</span>
+                </button>
+            </div>
         </div>
 
         <script src="main.js"></script>

@@ -8,6 +8,9 @@
   const sidebar = $(".sidebar");
   const chatPane = $(".chat");
   const chatList = $(".chat-list");
+  const chatSearch = $("#chatSearch");
+  const chatSearchClear = $("#chatSearchClear");
+  const filters = $(".filters");
   const thread = $("#chat_thread");
   const headName = $(".ch-name");
   const headSub = $(".ch-sub");
@@ -132,12 +135,21 @@
 
     current = name;
     showPane("chat");
+    applySearch();
     msgInput.focus({ preventScroll: true });
   }
 
   chatList.addEventListener("click", (e) => {
     const item = e.target.closest(".chat-item");
-    if (item) openChat(item);
+    if (!item) return;
+
+    const kebab = e.target.closest(".row-menu");
+    if (kebab) {
+      e.stopPropagation();
+      rowMenu(kebab, item);
+      return;
+    }
+    openChat(item);
   });
 
   chatList.addEventListener("keydown", (e) => {
@@ -149,6 +161,188 @@
   });
 
   $("#btnBack").addEventListener("click", () => showPane("list"));
+
+  /* ============================================================
+    SEARCHING EXISTING CONVERSATIONS
+    ============================================================ */
+
+  /* Each row keeps its own plain text in datasets, so the list can be
+       repainted with highlights and restored without losing anything. */
+  function indexItem(item) {
+    const msgEl = item.querySelector(".ci-msg");
+    const icon = msgEl.querySelector(".material-symbols-outlined");
+    const textSpan = $$("span", msgEl).find(
+      (s) => !s.classList.contains("material-symbols-outlined"),
+    );
+    item.dataset.icon = icon ? icon.textContent.trim() : "";
+    item.dataset.preview = (textSpan ? textSpan.textContent : "")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    if (!item.querySelector(".row-menu")) {
+      const kebab = document.createElement("button");
+      kebab.type = "button";
+      kebab.className = "row-menu";
+      kebab.setAttribute("aria-label", `Options for ${item.dataset.name}`);
+      kebab.setAttribute("aria-haspopup", "menu");
+      kebab.setAttribute("aria-expanded", "false");
+      kebab.innerHTML =
+        '<span class="material-symbols-outlined">more_vert</span>';
+      item.appendChild(kebab);
+    }
+  }
+
+  $$(".chat-item", chatList).forEach(indexItem);
+
+  function setPreview(item, text, icon) {
+    item.dataset.preview = text;
+    item.dataset.icon = icon || "";
+  }
+
+  function highlight(text, q) {
+    if (!q) return esc(text);
+    const hay = text.toLowerCase();
+    let out = "";
+    let i = 0;
+    for (;;) {
+      const at = hay.indexOf(q, i);
+      if (at < 0) return out + esc(text.slice(i));
+      out +=
+        esc(text.slice(i, at)) +
+        '<span class="hl">' +
+        esc(text.slice(at, at + q.length)) +
+        "</span>";
+      i = at + q.length;
+    }
+  }
+
+  /* Message-level search runs over the stored thread HTML, so a chat
+       still surfaces when the hit is buried in the conversation. */
+  let hitCache = { q: null, map: new Map() };
+
+  function messageHits(name, q) {
+    if (hitCache.q !== q) hitCache = { q, map: new Map() };
+    if (hitCache.map.has(name)) return hitCache.map.get(name);
+
+    const html = name === current ? thread.innerHTML : threads.get(name);
+    let hits = 0;
+    if (html) {
+      const box = document.createElement("div");
+      box.innerHTML = html;
+      hits = $$(".text", box).filter((t) =>
+        t.textContent.toLowerCase().includes(q),
+      ).length;
+    }
+    hitCache.map.set(name, hits);
+    return hits;
+  }
+
+  function paintItem(item, q, hits) {
+    const msgEl = item.querySelector(".ci-msg");
+    const preview = item.dataset.preview || "";
+    const inPreview = q && preview.toLowerCase().includes(q);
+
+    item.querySelector(".ci-name").innerHTML = highlight(item.dataset.name, q);
+
+    if (q && !inPreview && hits) {
+      msgEl.innerHTML = `<span class="ci-hits">${hits} pesan cocok</span>`;
+      return;
+    }
+    const icon = item.dataset.icon
+      ? `<span class="material-symbols-outlined">${esc(item.dataset.icon)}</span>`
+      : "";
+    msgEl.innerHTML = `${icon}<span>${highlight(preview, q)}</span>`;
+  }
+
+  const emptyRow = document.createElement("div");
+  emptyRow.className = "list-empty";
+  emptyRow.style.display = "none";
+  chatList.appendChild(emptyRow);
+
+  let activeFilter = "All";
+
+  function applySearch() {
+    const raw = chatSearch.value.trim();
+    const q = raw.toLowerCase();
+    const unreadOnly = activeFilter === "Unread";
+    chatSearchClear.style.display = chatSearch.value ? "grid" : "none";
+
+    let shown = 0;
+    $$(".chat-item", chatList).forEach((item) => {
+      const hits = q ? messageHits(item.dataset.name, q) : 0;
+      const matches =
+        !q ||
+        item.dataset.name.toLowerCase().includes(q) ||
+        (item.dataset.preview || "").toLowerCase().includes(q) ||
+        hits > 0;
+      const passesFilter = !unreadOnly || item.classList.contains("is-unread");
+      const visible = matches && passesFilter;
+
+      item.style.display = visible ? "flex" : "none";
+      if (visible) {
+        paintItem(item, q, hits);
+        shown++;
+      }
+    });
+
+    if (shown) {
+      emptyRow.style.display = "none";
+      emptyRow.innerHTML = "";
+    } else {
+      emptyRow.style.display = "block";
+      emptyRow.innerHTML = q
+        ? `Tidak ada chat yang cocok dengan <b>${esc(raw)}</b>.
+                   <br />Cari nama lain, atau mulai percakapan baru.
+                   <br /><button type="button" id="emptyNewChat">Start a new chat</button>`
+        : "Belum ada chat yang belum dibaca.";
+    }
+    // The empty row must always sit last, even after chats are reordered.
+    chatList.appendChild(emptyRow);
+  }
+
+  chatSearch.addEventListener("input", applySearch);
+
+  chatSearch.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      chatSearch.value = "";
+      applySearch();
+      return;
+    }
+    if (e.key === "Enter") {
+      // Jump straight into the top result.
+      const first = $$(".chat-item", chatList).find(
+        (el) => el.style.display !== "none",
+      );
+      if (first) openChat(first);
+    }
+  });
+
+  chatSearchClear.addEventListener("click", () => {
+    chatSearch.value = "";
+    applySearch();
+    chatSearch.focus({ preventScroll: true });
+  });
+
+  // Hand an unmatched search over to the contact picker.
+  chatList.addEventListener("click", (e) => {
+    if (!e.target.closest("#emptyNewChat")) return;
+    const carried = chatSearch.value.trim();
+    openPanel(false);
+    if (carried) {
+      ncSearch.value = carried;
+      renderContacts();
+    }
+  });
+
+  filters.addEventListener("click", (e) => {
+    const chip = e.target.closest(".chip");
+    if (!chip) return;
+    $$(".chip", filters).forEach((c) =>
+      c.setAttribute("aria-pressed", String(c === chip)),
+    );
+    activeFilter = chip.textContent.trim();
+    applySearch();
+  });
 
   /* ---------- Create / reuse a chat list item ---------- */
   function ensureChatItem({ name, av, sub, preview }) {
@@ -172,6 +366,7 @@
                 <div class="ci-meta"></div>
             </div>`;
     chatList.prepend(item);
+    indexItem(item);
     return item;
   }
 
@@ -243,16 +438,23 @@
 
   function contactRow(c) {
     const picked = groupMode && selected.has(c.name);
+    // A div, not a button: it now contains its own menu button,
+    // and nesting buttons is invalid.
     return `
-            <button class="contact${picked ? " sel" : ""}" type="button"
-                    aria-pressed="${picked}" data-contact="${esc(c.name)}">
+            <div class="contact${picked ? " sel" : ""}" role="button" tabindex="0"
+                 aria-pressed="${picked}" data-contact="${esc(c.name)}">
                 <div class="avatar ${c.av}">${esc(initials(c.name))}</div>
                 <div class="c-body">
                     <div class="c-name">${esc(c.name)}</div>
                     <div class="c-about">${esc(c.about)}</div>
                 </div>
                 ${picked ? '<span class="c-check material-symbols-outlined">check</span>' : ""}
-            </button>`;
+                <button class="row-menu contact-menu" type="button"
+                        aria-label="Options for ${esc(c.name)}"
+                        aria-haspopup="menu" aria-expanded="false">
+                    <span class="material-symbols-outlined">more_vert</span>
+                </button>
+            </div>`;
   }
 
   function renderContacts() {
@@ -290,10 +492,18 @@
   }
 
   ncSearch.addEventListener("input", renderContacts);
+  ncList.addEventListener("scroll", () => closeMenu());
 
   ncList.addEventListener("click", (e) => {
     const btn = e.target.closest(".contact");
     if (!btn) return;
+
+    const kebab = e.target.closest(".contact-menu");
+    if (kebab) {
+      e.stopPropagation();
+      contactMenu(kebab, btn.dataset.contact);
+      return;
+    }
 
     if (btn.dataset.action === "group") {
       openPanel(true);
@@ -311,6 +521,15 @@
     } else {
       startChat(c);
     }
+  });
+
+  // Contact rows are divs now, so Enter and Space need handling.
+  ncList.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    const row = e.target.closest(".contact");
+    if (!row || e.target.closest(".contact-menu")) return;
+    e.preventDefault();
+    row.click();
   });
 
   function startChat(c) {
@@ -333,7 +552,8 @@
       const span = document.createElement("span");
       span.className = "c-check material-symbols-outlined";
       span.textContent = "check";
-      btn.appendChild(span);
+      btn.insertBefore(span, btn.querySelector(".row-menu"));
+      return;
     } else if (!picked && check) {
       check.remove();
     }
@@ -423,11 +643,13 @@
 
     const item = byName(current);
     if (item) {
-      item.querySelector(".ci-msg").innerHTML =
-        `<span class="material-symbols-outlined">done_all</span><span>${esc(text)}</span>`;
+      setPreview(item, text, "done_all");
       item.querySelector(".ci-time").textContent = time;
       chatList.prepend(item);
     }
+
+    hitCache = { q: null, map: new Map() }; // thread changed
+    applySearch(); // repaint previews / re-run any live search
 
     msgInput.value = "";
     msgInput.focus({ preventScroll: true });
@@ -438,5 +660,535 @@
     if (e.key === "Enter") send();
   });
 
+  /* ============================================================
+    KEBAB MENUS + REFRESH
+    ============================================================ */
+  const menu = $("#menu");
+  const snack = $("#snack");
+  let menuAnchor = null;
+  let menuItems = [];
+  let snackTimer = null;
+
+  function say(text) {
+    snack.textContent = text;
+    snack.style.display = "block";
+    snack.animate(
+      [
+        { opacity: 0, transform: "translate(-50%, 8px)" },
+        { opacity: 1, transform: "translate(-50%, 0)" },
+      ],
+      { duration: reduceMotion.matches ? 0 : 160, easing: "ease-out" },
+    );
+    clearTimeout(snackTimer);
+    snackTimer = setTimeout(() => {
+      const out = snack.animate([{ opacity: 1 }, { opacity: 0 }], {
+        duration: reduceMotion.matches ? 0 : 200,
+      });
+      out.onfinish = () => (snack.style.display = "none");
+    }, 1900);
+  }
+
+  function closeMenu() {
+    if (!menuAnchor) return;
+    menuAnchor.setAttribute("aria-expanded", "false");
+    menuAnchor = null;
+    menuItems = [];
+    menu.style.display = "none";
+  }
+
+  function openMenu(anchor, items) {
+    if (menuAnchor === anchor) {
+      closeMenu(); // second click on the same button closes it
+      return;
+    }
+    closeMenu();
+    menuItems = items;
+    menu.innerHTML = items
+      .map(
+        (it, i) => `
+                <button class="menu-item" type="button" role="menuitem" data-i="${i}">
+                    <span class="material-symbols-outlined">${esc(it.icon)}</span>${esc(it.label)}
+                </button>`,
+      )
+      .join("");
+
+    // Measure first, then place: flip up or clamp when near an edge.
+    menu.style.visibility = "hidden";
+    menu.style.display = "block";
+    menu.style.left = "0px";
+    menu.style.top = "0px";
+
+    const box = anchor.getBoundingClientRect();
+    const w = menu.offsetWidth;
+    const h = menu.offsetHeight;
+    let left = Math.min(box.right - w, window.innerWidth - w - 8);
+    let top = box.bottom + 6;
+    if (left < 8) left = 8;
+    if (top + h > window.innerHeight - 8) top = Math.max(8, box.top - h - 6);
+
+    menu.style.left = `${left}px`;
+    menu.style.top = `${top}px`;
+    menu.style.visibility = "visible";
+    menu.animate(
+      [
+        { opacity: 0, transform: "scale(.96)" },
+        { opacity: 1, transform: "none" },
+      ],
+      { duration: reduceMotion.matches ? 0 : 120, easing: "ease-out" },
+    );
+
+    menuAnchor = anchor;
+    anchor.setAttribute("aria-expanded", "true");
+    menu.querySelector(".menu-item").focus({ preventScroll: true });
+  }
+
+  menu.addEventListener("click", (e) => {
+    const btn = e.target.closest(".menu-item");
+    if (!btn) return;
+    const item = menuItems[Number(btn.dataset.i)];
+    const anchor = menuAnchor;
+    closeMenu();
+    if (item) item.run(anchor);
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!menuAnchor) return;
+    if (e.target.closest("#menu") || e.target.closest("[aria-haspopup='menu']"))
+      return;
+    closeMenu();
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape" || !menuAnchor) return;
+    const anchor = menuAnchor;
+    closeMenu();
+    anchor.focus({ preventScroll: true });
+    e.stopImmediatePropagation(); // don't also hang up a call
+  });
+
+  window.addEventListener("resize", closeMenu);
+  chatList.addEventListener("scroll", closeMenu);
+
+  /* Spin the button while the "fetch" is in flight. This is where a
+       real reload would await the server. */
+  function busy(anchor, run) {
+    const icon = anchor.querySelector(".material-symbols-outlined");
+    const was = icon.textContent;
+    icon.textContent = "progress_activity";
+    icon.classList.add("spin");
+    anchor.disabled = true;
+    setTimeout(() => {
+      icon.textContent = was;
+      icon.classList.remove("spin");
+      anchor.disabled = false;
+      run();
+    }, 650);
+  }
+
+  const REFRESH = { icon: "refresh", label: "Refresh" };
+
+  /* --- Chat header: reload the open conversation --- */
+  $("#btnChatMenu").addEventListener("click", (e) => {
+    e.stopPropagation();
+    openMenu(e.currentTarget, [
+      {
+        ...REFRESH,
+        run: (anchor) =>
+          busy(anchor, () => {
+            threads.set(current, thread.innerHTML);
+            thread.innerHTML = threads.get(current) || emptyThread(current);
+            thread.scrollTop = thread.scrollHeight;
+            hitCache = { q: null, map: new Map() };
+            say(`Chat dengan ${current} dimuat ulang`);
+          }),
+      },
+    ]);
+  });
+
+  /* --- Chat list header: reload every conversation --- */
+  $("#btnListMenu").addEventListener("click", (e) => {
+    e.stopPropagation();
+    openMenu(e.currentTarget, [
+      {
+        ...REFRESH,
+        run: (anchor) =>
+          busy(anchor, () => {
+            $$(".chat-item", chatList).forEach(indexItem);
+            hitCache = { q: null, map: new Map() };
+            applySearch();
+            say("Daftar chat dimuat ulang");
+          }),
+      },
+    ]);
+  });
+
+  /* --- One conversation row --- */
+  function rowMenu(anchor, item) {
+    openMenu(anchor, [
+      {
+        ...REFRESH,
+        run: (a) =>
+          busy(a, () => {
+            indexItem(item);
+            hitCache = { q: null, map: new Map() };
+            applySearch();
+            say(`${item.dataset.name} dimuat ulang`);
+          }),
+      },
+    ]);
+  }
+
+  /* --- One contact row --- */
+  function contactMenu(anchor, name) {
+    openMenu(anchor, [
+      {
+        ...REFRESH,
+        run: (a) =>
+          busy(a, () => {
+            renderContacts();
+            say(`Kontak ${name} dimuat ulang`);
+          }),
+      },
+    ]);
+  }
+
+  /* ============================================================
+    CALLS
+    ============================================================ */
+  const overlay = $("#callOverlay");
+  const callCard = $("#callCard");
+  const callStage = $("#callStage");
+  const callStageAvatar = $("#callStageAvatar");
+  const callAvatar = $("#callAvatar");
+  const callName = $("#callName");
+  const callStatus = $("#callStatus");
+  const callFlags = $("#callFlags");
+  const callMute = $("#callMute");
+  const callCam = $("#callCam");
+  const callSpeaker = $("#callSpeaker");
+  const toast = $("#callToast");
+  const ctAvatar = $("#ctAvatar");
+  const ctName = $("#ctName");
+  const ctSub = $("#ctSub");
+
+  let call = null; // the one call in flight, or null
+  let ticker = null;
+  let stage = []; // pending timeouts standing in for the far end
+
+  const at = (fn, ms) => stage.push(setTimeout(fn, ms));
+  const clearStage = () => {
+    stage.forEach(clearTimeout);
+    stage = [];
+  };
+
+  const duration = (s) =>
+    `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+
+  /* Avatar colour + initials for whoever is on the other end. */
+  function faceOf(name) {
+    const item = byName(name);
+    if (item) {
+      const av = item.querySelector(".avatar");
+      return {
+        av: (av.className.match(/a[1-6]/) || ["a1"])[0],
+        initials: av.textContent.trim(),
+      };
+    }
+    const c = CONTACTS.find((x) => x.name === name);
+    return { av: c ? c.av : "a1", initials: initials(name) };
+  }
+
+  function paintCall() {
+    callName.textContent = call.name;
+    callAvatar.className = "avatar " + call.face.av;
+    callAvatar.textContent = call.face.initials;
+    callStageAvatar.className = "avatar " + call.face.av;
+    callStageAvatar.textContent = call.face.initials;
+
+    // The stage follows the camera, so killing video mid-call
+    // falls back to the voice layout.
+    callStage.style.display = call.cam ? "grid" : "none";
+    callAvatar.style.display = call.cam ? "none" : "grid";
+    setFlags();
+  }
+
+  function setStatus(text) {
+    callStatus.textContent = text;
+  }
+
+  function setFlags() {
+    const flags = [];
+    if (call.muted) flags.push("Muted");
+    if (call.kind === "video" && !call.cam) flags.push("Camera off");
+    if (call.speaker) flags.push("Speaker");
+    callFlags.textContent = flags.join(" · ");
+  }
+
+  function openOverlay() {
+    overlay.style.display = "grid";
+    const ms = reduceMotion.matches ? 0 : 170;
+    overlay.animate([{ opacity: 0 }, { opacity: 1 }], { duration: ms });
+    callCard.animate(
+      [
+        { transform: "scale(.94)", opacity: 0 },
+        { transform: "none", opacity: 1 },
+      ],
+      { duration: ms, easing: "cubic-bezier(.2,.8,.3,1)" },
+    );
+    $("#callEnd").focus({ preventScroll: true });
+  }
+
+  function closeOverlay() {
+    const anim = overlay.animate([{ opacity: 1 }, { opacity: 0 }], {
+      duration: reduceMotion.matches ? 0 : 170,
+    });
+    anim.onfinish = () => (overlay.style.display = "none");
+  }
+
+  function showToast(show) {
+    const ms = reduceMotion.matches ? 0 : 200;
+    if (show) {
+      toast.style.display = "flex";
+      toast.animate(
+        [
+          { transform: "translateY(14px)", opacity: 0 },
+          { transform: "none", opacity: 1 },
+        ],
+        { duration: ms, easing: "cubic-bezier(.2,.8,.3,1)" },
+      );
+      ctAvatar.classList.add("ringing");
+      $("#ctAccept").focus({ preventScroll: true });
+      return;
+    }
+    ctAvatar.classList.remove("ringing");
+    const anim = toast.animate(
+      [
+        { transform: "none", opacity: 1 },
+        { transform: "translateY(14px)", opacity: 0 },
+      ],
+      { duration: ms },
+    );
+    anim.onfinish = () => (toast.style.display = "none");
+  }
+
+  /* ---------- Outgoing ---------- */
+  function startCall(kind) {
+    if (call) return; // one line at a time
+    call = {
+      name: current,
+      face: faceOf(current),
+      kind,
+      direction: "out",
+      secs: 0,
+      muted: false,
+      cam: kind === "video",
+      speaker: false,
+      answered: true,
+    };
+    syncToggles();
+    paintCall();
+    setStatus("Calling…");
+    openOverlay();
+
+    // Stand-in for the far end — replace with hub events.
+    at(() => setStatus("Ringing…"), 1300);
+    at(connect, 4200);
+  }
+
+  /* ---------- Incoming ---------- */
+  function ringIncoming(name, kind) {
+    if (call) return;
+    call = {
+      name,
+      face: faceOf(name),
+      kind,
+      direction: "in",
+      secs: 0,
+      muted: false,
+      cam: kind === "video",
+      speaker: false,
+      answered: false,
+    };
+    ctAvatar.className = "avatar " + call.face.av;
+    ctAvatar.textContent = call.face.initials;
+    ctName.textContent = name;
+    ctSub.textContent = `Incoming ${kind} call`;
+    showToast(true);
+
+    at(() => endCall("no-answer"), 25000); // nobody picked up
+  }
+
+  function acceptCall() {
+    if (!call || call.direction !== "in" || call.answered) return;
+    clearStage();
+    call.answered = true;
+    showToast(false);
+    syncToggles();
+    paintCall();
+    openOverlay();
+    connect();
+  }
+
+  function connect() {
+    clearStage();
+    call.connected = true;
+    call.secs = 0;
+    setStatus(duration(0));
+    clearInterval(ticker);
+    ticker = setInterval(() => {
+      call.secs++;
+      setStatus(duration(call.secs));
+    }, 1000);
+  }
+
+  /* ---------- Hanging up ---------- */
+  function endCall(reason) {
+    if (!call) return;
+    clearStage();
+    clearInterval(ticker);
+    ticker = null;
+
+    const { name, kind, direction, secs, connected, answered } = call;
+
+    // Never picked up: no call screen was ever shown.
+    if (direction === "in" && !answered) {
+      showToast(false);
+      call = null;
+      logCall(name, {
+        kind,
+        missed: true,
+        text:
+          reason === "declined"
+            ? `Declined ${kind} call`
+            : `Missed ${kind} call`,
+      });
+      return;
+    }
+
+    setStatus(connected ? "Call ended" : "Call cancelled");
+    call = null;
+    logCall(name, {
+      kind,
+      missed: !connected,
+      text: connected
+        ? `${kind === "video" ? "Video" : "Voice"} call · ${duration(secs)}`
+        : `Cancelled ${kind} call`,
+      preview: connected ? duration(secs) : "",
+    });
+    at(closeOverlay, reduceMotion.matches ? 0 : 850);
+  }
+
+  /* ---------- Call log in the thread + chat list ---------- */
+  function logCall(name, { kind, text, missed, preview }) {
+    const icon = missed
+      ? "phone_missed"
+      : kind === "video"
+        ? "videocam"
+        : "call";
+    const html = `<div class="pill call-log${missed ? " missed" : ""}">
+                <span class="material-symbols-outlined">${icon}</span>${esc(text)} · ${now()}
+            </div>`;
+
+    if (name === current) {
+      const note = thread.querySelector(".empty-note");
+      if (note) note.remove();
+      thread.insertAdjacentHTML("beforeend", html);
+      thread.scrollTop = thread.scrollHeight;
+    } else {
+      const box = document.createElement("div");
+      box.innerHTML = threads.get(name) || emptyThread(name);
+      const note = box.querySelector(".empty-note");
+      if (note) note.remove();
+      box.insertAdjacentHTML("beforeend", html);
+      threads.set(name, box.innerHTML);
+    }
+
+    const item = byName(name);
+    if (item) {
+      setPreview(item, preview || text, icon);
+      item.querySelector(".ci-time").textContent = now();
+      chatList.prepend(item);
+      if (missed) markUnread(item);
+    }
+    hitCache = { q: null, map: new Map() };
+    applySearch();
+  }
+
+  function markUnread(item) {
+    if (item.classList.contains("is-active")) return;
+    item.classList.add("is-unread");
+    const meta = item.querySelector(".ci-meta");
+    let badge = meta.querySelector(".badge");
+    if (!badge) {
+      badge = document.createElement("span");
+      badge.className = "badge";
+      badge.textContent = "0";
+      meta.appendChild(badge);
+    }
+    badge.textContent = String((Number(badge.textContent) || 0) + 1);
+    item.querySelector(".ci-time").style.color = "var(--accent)";
+  }
+
+  /* ---------- In-call toggles ---------- */
+  function syncToggles() {
+    callMute.classList.toggle("on", call.muted);
+    callMute.setAttribute("aria-pressed", String(call.muted));
+    callMute.querySelector("span").textContent = call.muted ? "mic_off" : "mic";
+
+    callCam.classList.toggle("on", call.cam);
+    callCam.setAttribute("aria-pressed", String(call.cam));
+    callCam.querySelector("span").textContent = call.cam
+      ? "videocam"
+      : "videocam_off";
+
+    callSpeaker.classList.toggle("on", call.speaker);
+    callSpeaker.setAttribute("aria-pressed", String(call.speaker));
+  }
+
+  callMute.addEventListener("click", () => {
+    if (!call) return;
+    call.muted = !call.muted;
+    syncToggles();
+    setFlags();
+  });
+
+  callCam.addEventListener("click", () => {
+    if (!call) return;
+    call.cam = !call.cam;
+    if (call.cam) call.kind = "video"; // camera on upgrades the call
+    syncToggles();
+    paintCall();
+  });
+
+  callSpeaker.addEventListener("click", () => {
+    if (!call) return;
+    call.speaker = !call.speaker;
+    syncToggles();
+    setFlags();
+  });
+
+  $("#callEnd").addEventListener("click", () => endCall("hangup"));
+  $("#ctAccept").addEventListener("click", acceptCall);
+  $("#ctDecline").addEventListener("click", () => endCall("declined"));
+
+  $("#btnVoiceCall").addEventListener("click", () => startCall("voice"));
+  $("#btnVideoCall").addEventListener("click", () => startCall("video"));
+
+  // Stub for the ringing side — swap for a SignalR "IncomingCall" handler.
+  $("#btnSimIncoming").addEventListener("click", () => {
+    if (call) return;
+    const rows = $$(".chat-item", chatList);
+    const from =
+      (rows[Math.floor(Math.random() * rows.length)] || {}).dataset?.name ||
+      current;
+    ringIncoming(from, Math.random() < 0.3 ? "video" : "voice");
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape" || !call) return;
+    endCall(call.direction === "in" && !call.answered ? "declined" : "hangup");
+  });
+
+  applySearch();
   thread.scrollTop = thread.scrollHeight;
 })();
